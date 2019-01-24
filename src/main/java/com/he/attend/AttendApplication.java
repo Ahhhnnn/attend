@@ -3,6 +3,9 @@ package com.he.attend;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import org.wf.jwtp.configuration.EnableJwtPermission;
+
+@EnableJwtPermission
 @SpringBootApplication
 public class AttendApplication {
 

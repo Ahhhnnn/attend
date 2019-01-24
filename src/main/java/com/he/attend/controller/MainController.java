@@ -33,8 +33,8 @@ import java.util.List;
 public class MainController extends BaseController {
     @Autowired
     private UserService userService;
-
-   // private TokenStore tokenStore;
+    @Autowired
+    private TokenStore tokenStore;
     @Autowired
     private AuthoritiesService authoritiesService;
     @Autowired
@@ -72,8 +72,8 @@ public class MainController extends BaseController {
         }
         String[] roles = arrayToString(userRoleService.getRoleIds(user.getUserId()));
         String[] permissions = listToArray(authoritiesService.listByUserId(user.getUserId()));
-        //Token token = tokenStore.createNewToken(String.valueOf(user.getUserId()), permissions, roles);
-        return JsonResult.ok("登录成功").put("access_token", "123456");
+        Token token = tokenStore.createNewToken(String.valueOf(user.getUserId()), permissions, roles);
+        return JsonResult.ok("登录成功").put("access_token",token.getAccessToken());
     }
 
     private String[] listToArray(List<String> list) {
