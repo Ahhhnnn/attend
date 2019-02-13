@@ -34,6 +34,17 @@ public class PageResult<T> {
         this.code = 0;
         this.msg = "";
     }
+    public PageResult(String msg) {
+        this.count = 0;
+        this.data = null;
+        this.code = 0;
+        this.msg = msg;
+    }
+
+    public PageResult(String msg,int code){
+        this.msg=msg;
+        this.code=code;
+    }
 
     public int getCode() {
         return code;

@@ -245,6 +245,7 @@
                         d.field.roleIds = formSelects.value('selRole', 'valStr');
                         layer.load(2);
                         admin.req('user', d.field, function (res) {
+                            console.log(d.field);
                             layer.closeAll('loading');
                             if (res.code == 200) {
                                 layer.msg(res.msg, {icon: 1});

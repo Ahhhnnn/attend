@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>日月报展示</title>
+    <link rel="icon" href="../../assets/images/favicon.ico"/>
+    <link rel="stylesheet" href="../../assets/libs/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../assets/module/formSelects/formSelects-v4.css" media="all">
+    <link rel="stylesheet" href="../../assets/common.css" media="all">
+</head>
+<body>
+<h1>测试日期控件</h1>
+<div class="layui-inline"> <!-- 注意：这一层元素并不是必须的 -->
+    <input type="text" class="layui-input" id="test1">
+</div>
+
+<script src="../../assets/libs/layui/layui.js"></script>
+<script>
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#test1' //指定元素
+        });
+    });
+</script>
+</body>
+</html>

@@ -20,17 +20,18 @@
             <div style="display: inline-block;width: 100px;margin-right: 10px;">
                 <select id="sltKey">
                     <option value="">搜索条件</option>
-                    <option value="username">账号</option>
-                    <option value="nick_name" selected="selected">姓名</option>
+                    <option value="staff_name" selected="selected">姓名</option>
                     <option value="sex">性别</option>
                     <option value="phone">手机号</option>
+                    <option value="dept_id">部门编号</option>
+                    <option value="dept_name">部门名称</option>
                 </select>
             </div>
             <div style="display: inline-block;margin-right: 10px;width: 160px;">
                 <input id="edtSearch" class="layui-input" type="text" placeholder="输入关键字"/>
             </div>
             <div class="layui-inline">
-                <button id="userBtnSearch" class="layui-btn icon-btn"><i class="layui-icon">&#xe615;</i>搜索人员</button>
+                <button id="userBtnSearch" class="layui-btn icon-btn"><i class="layui-icon">&#xe615;</i>查询人员</button>
                 <button id="userBtnAdd" class="layui-btn icon-btn"><i class="layui-icon">&#xe654;</i>添加人员</button>
             </div>
 
@@ -42,31 +43,24 @@
 
 <!-- 表格操作列 -->
 <script type="text/html" id="tableBar">
-    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="reset">重置密码</a>
+   <!-- <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="reset">重置密码</a>-->
     <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="edit">修改</a>
     <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
 </script>
 <!-- 表格状态列 -->
 <script type="text/html" id="tbaleState">
     <input type="checkbox" lay-filter="ckState" lay-skin="switch" lay-text="正常|锁定"
-           value="{{d.userId}}" {{d.state==0?'checked':''}}/>
+           value="{{d.staffId}}" {{d.state==0?'checked':''}}/>
 </script>
 <!-- 表单弹窗 -->
 <script type="text/html" id="userForm">
     <form lay-filter="userForm" class="layui-form model-form">
-        <input name="userId" type="hidden"/>
-        <div class="layui-form-item">
-            <label class="layui-form-label">账号</label>
-            <div class="layui-input-block">
-                <input name="username" placeholder="请输入账号" type="text" class="layui-input"
-                       maxlength="20" lay-verify="required" required/>
-            </div>
-        </div>
+        <input name="staffId" type="hidden"/>
         <div class="layui-form-item">
             <label class="layui-form-label">姓名</label>
             <div class="layui-input-block">
-                <input name="nickName" placeholder="请输入姓名" type="text" class="layui-input"
-                       maxlength="20" lay-verify="required" required/>
+                <input name="staffName" placeholder="请输入员工姓名" type="text" class="layui-input"
+                       maxlength="10" lay-verify="required" required/>
             </div>
         </div>
         <div class="layui-form-item">
@@ -77,18 +71,47 @@
             </div>
         </div>
         <div class="layui-form-item">
+            <label class="layui-form-label">邮箱</label>
+            <div class="layui-input-block">
+                <input name="email" placeholder="请输入邮箱" type="text" class="layui-input"
+                       maxlength="20" lay-verify="required" required/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">部门编号</label>
+            <div class="layui-input-block">
+                <input name="deptId" placeholder="请输入部门编号" type="text" class="layui-input"
+                       maxlength="20" lay-verify="required" required/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">部门名称</label>
+            <div class="layui-input-block">
+                <input name="deptName" placeholder="请输入部门名称" type="text" class="layui-input"
+                       maxlength="20" lay-verify="required" required/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">出生日期</label>
+            <div class="layui-input-block">
+                <input id="datetest" name="birthday" placeholder="请选择出生日期" type="text" class="layui-input"
+                        lay-verify="required" required/>
+            </div>
+        </div>
+        <div class="layui-form-item">
             <label class="layui-form-label">性别</label>
             <div class="layui-input-block">
                 <input type="radio" name="sex" value="男" title="男" checked/>
                 <input type="radio" name="sex" value="女" title="女"/>
             </div>
         </div>
-        <div class="layui-form-item">
+
+        <!--<div class="layui-form-item">
             <label class="layui-form-label">角色</label>
             <div class="layui-input-block">
                 <select name="roleId" xm-select="selRole" xm-select-skin="default" lay-verify="required"></select>
             </div>
-        </div>
+        </div>-->
         <div class="layui-form-item text-right">
             <button class="layui-btn layui-btn-primary" type="button" ew-event="closeDialog">取消</button>
             <button class="layui-btn" lay-filter="userFormSubmit" lay-submit>保存</button>
@@ -100,7 +123,7 @@
 <script type="text/javascript" src="../assets/libs/layui/layui.js"></script>
 <script type="text/javascript" src="../assets/common.js"></script>
 <script>
-    layui.use(['layer', 'form', 'table', 'util', 'formSelects', 'admin'], function () {
+    layui.use(['layer', 'form', 'table', 'util', 'formSelects', 'admin','laydate'], function () {
         var $ = layui.jquery;
         var layer = layui.layer;
         var form = layui.form;
@@ -109,11 +132,12 @@
         var formSelects = layui.formSelects;
         var admin = layui.admin;
         var mRoles = [];  // 全部角色
+        var laydate = layui.laydate;
 
         // 渲染表格
         table.render({
             elem: '#userTable',
-            url: base_server + 'user/query',
+            url: base_server + 'staff/query',
             method: 'post',
             where: {
                 access_token: admin.getToken()
@@ -122,19 +146,11 @@
             cellMinWidth: 100,
             cols: [[
                 {type: 'numbers'},
-                {field: 'username', title: '账号'},
-                {field: 'nickName', title: '姓名'},
+                {field: 'staffName', title: '姓名'},
                 {field: 'phone', title: '手机号'},
                 {field: 'sex', title: '性别'},
-                {
-                    templet: function (d) {
-                        var str = '';
-                        for (var i = 0; i < d.roles.length; i++) {
-                            str += ('<span class="layui-badge-rim">' + d.roles[i].roleName + '</span>');
-                        }
-                        return str;
-                    }, title: '角色'
-                },
+                {field: 'email', title: '邮箱'},
+                {field: 'deptName', title: '所属部门'},
                 {
                     templet: function (d) {
                         return util.toDateString(d.createTime);
@@ -156,7 +172,7 @@
 
         // 添加按钮点击事件
         $('#userBtnAdd').click(function () {
-            showEditModel();
+            showAddModel();
         });
 
         // 工具条点击事件
@@ -168,7 +184,7 @@
                 layer.confirm('确定删除此用户吗？', function (i) {
                     layer.close(i);
                     layer.load(2);
-                    admin.req('user/' + obj.data.userId, {}, function (data) {
+                    admin.req('staff/delete/' + obj.data.staffId, {}, function (data) {
                         layer.closeAll('loading');
                         if (data.code == 200) {
                             layer.msg(data.msg, {icon: 1});
@@ -178,7 +194,7 @@
                         }
                     }, 'DELETE');
                 });
-            } else if (layEvent === 'reset') { // 重置密码
+            }/* else if (layEvent === 'reset') { // 重置密码
                 layer.confirm('确定重置此用户的密码吗？<br><span style="color: red;">（初始密码为123456）</span>', function (i) {
                     layer.close(i);
                     layer.load(2);
@@ -191,16 +207,16 @@
                         }
                     }, 'PUT');
                 });
-            } else if (layEvent === 'edit') { // 修改
+            }*/ else if (layEvent === 'edit') { // 修改
                 showEditModel(data);
             }
         });
 
-        // 修改user状态
+        // 修改staff状态
         form.on('switch(ckState)', function (obj) {
             layer.load(2);
-            admin.req('user/state', {
-                userId: obj.elem.value,
+            admin.req('staff/state', {
+                staffId: obj.elem.value,
                 state: obj.elem.checked ? 0 : 1
             }, function (data) {
                 layer.closeAll('loading');
@@ -220,31 +236,31 @@
                 type: 1,
                 area: '360px',
                 offset: '65px',
-                title: data ? '修改用户' : '添加用户',
+                title: '修改用户',
                 content: $('#userForm').html(),
                 success: function (layero, index) {
                     $(layero).children('.layui-layer-content').css('overflow', 'visible');
                     form.render('radio');
                     // 渲染角色下拉框
-                    var roleSelData = new Array();
+                   /* var roleSelData = new Array();
                     for (var i = 0; i < mRoles.length; i++) {
                         roleSelData.push({name: mRoles[i].roleName, value: mRoles[i].roleId});
-                    }
-                    formSelects.data('selRole', 'local', {arr: roleSelData});
+                    }*/
+                    //formSelects.data('selRole', 'local', {arr: roleSelData});
                     // 回显user数据
                     if (data) {
                         form.val('userForm', data);
-                        var rds = new Array();
-                        for (var i = 0; i < data.roles.length; i++) {
+                        //var rds = new Array();
+                        /*for (var i = 0; i < data.roles.length; i++) {
                             rds.push(data.roles[i].roleId);
-                        }
-                        formSelects.value('selRole', rds);  // 回显多选框
+                        }*/
+                        //formSelects.value('selRole', rds);  // 回显多选框
                     }
                     // 表单提交事件
                     form.on('submit(userFormSubmit)', function (d) {
-                        d.field.roleIds = formSelects.value('selRole', 'valStr');
+                        //d.field.roleIds = formSelects.value('selRole', 'valStr');
                         layer.load(2);
-                        admin.req('user', d.field, function (res) {
+                        admin.req('staff/update', d.field, function (res) {
                             layer.closeAll('loading');
                             if (res.code == 200) {
                                 layer.msg(res.msg, {icon: 1});
@@ -253,10 +269,64 @@
                             } else {
                                 layer.msg(res.msg, {icon: 2});
                             }
-                        }, data ? 'PUT' : 'POST');
+                        },'PUT');
                         return false;
                     });
                 }
+            });
+            //日期选择实例
+            laydate.render({
+                elem: '#datetest' //指定元素
+            });
+        }
+
+        function showAddModel() {
+            layer.open({
+                type: 1,
+                area: '360px',
+                offset: '65px',
+                title: '添加用户',
+                content: $('#userForm').html(),
+                success: function (layero, index) {
+                    $(layero).children('.layui-layer-content').css('overflow', 'visible');
+                    form.render('radio');
+                    // 渲染角色下拉框
+                    /* var roleSelData = new Array();
+                     for (var i = 0; i < mRoles.length; i++) {
+                         roleSelData.push({name: mRoles[i].roleName, value: mRoles[i].roleId});
+                     }*/
+                    //formSelects.data('selRole', 'local', {arr: roleSelData});
+                    // 回显user数据
+                    /*if (data) {
+                        form.val('userForm', data);
+                        var rds = new Array();
+                        for (var i = 0; i < data.roles.length; i++) {
+                            rds.push(data.roles[i].roleId);
+                        }
+                        formSelects.value('selRole', rds);  // 回显多选框
+                    }*/
+                    // 表单提交事件
+                    form.on('submit(userFormSubmit)', function (d) {
+                        //d.field.roleIds = formSelects.value('selRole', 'valStr');
+                        layer.load(2);
+                        admin.req('staff/insert', d.field, function (res) {
+                            console.log(d);
+                            layer.closeAll('loading');
+                            if (res.code == 200) {
+                                layer.msg(res.msg, {icon: 1});
+                                layer.closeAll('page');
+                                table.reload('userTable');
+                            } else {
+                                layer.msg(res.msg, {icon: 2});
+                            }
+                        }, 'POST');
+                        return false;
+                    });
+                }
+            });
+            //日期选择实例
+            laydate.render({
+                elem: '#datetest' //指定元素
             });
         }
 
