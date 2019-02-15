@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.he.attend.dao.ShiftMapper">
+
+    <select id="getByShiftName" resultType="com.he.attend.model.Shift">
+        select * from ts_shift where shift_name=#{shiftName}
+    </select>
+
+    <update id="updateById" parameterType="integer" >
+        UPDATE ts_shift set state=#{state} where shift_id=#{shiftId}
+    </update>
+    <delete id="deleteById" parameterType="integer">
+        delete from ts_shift where shift_id=#{shiftId}
+    </delete>
+    <update id="update" parameterType="com.he.attend.model.Shift">
+      UPDATE ts_shift set shift_name=#{shiftName},begin_time=#{beginTime},end_time=#{endTime} where shift_id=#{shiftId}
+    </update>
+</mapper>
