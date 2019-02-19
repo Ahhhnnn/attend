@@ -6,16 +6,15 @@ import lombok.Data;
 
 import java.sql.Date;
 
-
 @Data
-@TableName("ts_shift")
-public class Shift {
+@TableName("ts_dept")
+public class Dept {
     @TableId
-    private Integer shiftId;//班次id
-    private String shiftName;//班次名称
-    private String beginTime;//班次开始时间
-    private String endTime;//班次结束时间
-    private Integer state;//状态
+    private Integer id; //主键id
+    private Integer deptId;//部门编号
+    private String deptName;//部门名称
+    private Integer statu;//状态
+    private Integer dr;//逻辑删除标志
     private Date createTime;//创建时间
     private Date updateTime;//更新时间
 }

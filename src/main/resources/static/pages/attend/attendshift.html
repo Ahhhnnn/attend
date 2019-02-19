@@ -41,8 +41,8 @@
 
 <!-- 表格操作列 -->
 <script type="text/html" id="tableBar">
-    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="edit">修改</a>
-    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    <a class="layui-btn layui-btn-primary layui-btn-sm" lay-event="edit">修改</a>
+    <a class="layui-btn layui-btn-danger layui-btn-sm" lay-event="del">删除</a>
 </script>
 <!-- 表格状态列 -->
 <script type="text/html" id="tbaleState">
@@ -108,7 +108,7 @@
             cellMinWidth: 100,
             cols: [[
                 {type: 'numbers'},
-                {field: 'shiftId', title: '班次编号'},
+                {field: 'shiftId', title: '班次编号',hide:true},
                 {field: 'shiftName', title: '班次名称'},
                 {field: 'beginTime', title: '开始时间'},
                 {field: 'endTime', title: '结束时间'},

@@ -79,7 +79,7 @@ public class StaffController {
                 wrapper.eq(searchKey, searchValue);
             }
         }
-        wrapper.orderBy("createTime", true);
+        wrapper.orderBy("create_time", true);
         staffService.selectPage(userPage, wrapper);
         List<Staff> userList = userPage.getRecords();
         return new PageResult<>(userList, userPage.getTotal());

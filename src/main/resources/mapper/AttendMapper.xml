@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.he.attend.dao.AttendMapper">
+
+<update id="logicDelete" parameterType="integer">
+    UPDATE ts_attend set dr=1 where attend_id=#{attendId}
+</update>
+
+</mapper>

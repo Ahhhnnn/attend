@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>考勤地点</title>
+    <link rel="icon" href="../../assets/images/favicon.ico"/>
+    <link rel="stylesheet" href="../../assets/libs/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../assets/module/formSelects/formSelects-v4.css" media="all">
+    <link rel="stylesheet" href="../../assets/common.css" media="all">
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=HhCMbCFIZflrA1SB39WFayweoIjoWCOP"></script>
+</head>
+
+<body>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-body layui-form">
+            <div style="display: inline-block;width: 100px;margin-right: 10px;">
+                <select id="sltKey">
+                    <option value="" selected="selected">搜索条件</option>
+                    <option value="name">地点名称</option>
+                    <option value="rel_name">精确地点</option>
+
+                </select>
+            </div>
+            <div style="display: inline-block;margin-right: 10px;width: 160px;">
+                <input id="edtSearch" class="layui-input" type="text" placeholder="输入关键字"/>
+            </div>
+            <div class="layui-inline">
+                <button id="placeBtnSearch" class="layui-btn icon-btn"><i class="layui-icon">&#xe615;</i>搜索</button>
+                <button id="placeBtnAdd" class="layui-btn icon-btn"><i class="layui-icon">&#xe654;</i>添加</button>
+            </div>
+
+            <table class="layui-table" id="placeTable" lay-filter="placeTable"></table>
+        </div>
+    </div>
+
+</div>
+
+<!-- 表格操作列 -->
+<script type="text/html" id="tableBar">
+    <a class="layui-btn layui-btn-primary layui-btn-sm" lay-event="edit">修改</a>
+    <a class="layui-btn layui-btn-danger layui-btn-sm" lay-event="del">删除</a>
+</script>
+<!-- 表格状态列 -->
+<script type="text/html" id="tbaleState">
+    <input type="checkbox" lay-filter="ckState" lay-skin="switch" lay-text="启用|禁用"
+           value="{{d.id}}" {{d.statu==0?'checked':''}}/>
+</script>
+<!-- 表单弹窗 添加的表单-->
+<script type="text/html" id="placeForm">
+    <form lay-filter="placeForm" class="layui-form model-form">
+        <input name="id" type="hidden"/>
+        <div class="layui-form-item">
+            <label class="layui-form-label">名称</label>
+            <div class="layui-input-block">
+                <input name="name" placeholder="请输入考勤地点名称" type="text" class="layui-input"
+                       maxlength="20" lay-verify="required" required/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">精确地点</label>
+            <div class="layui-input-block">
+                <input id="relName"  name="relName" placeholder="请输入精确地点" type="text" class="layui-input"
+                       maxlength="20" lay-verify="required" required/>
+            </div>
+        </div>
+        <!--<div><input id="map" type="button" value="点击看地图"></div>-->
+        <div class="layui-form-item">
+            <label class="layui-form-label">经度</label>
+            <div class="layui-input-block">
+                <input id="longitude" name="longitude" placeholder="" type="text" class="layui-input"
+                       maxlength="20" lay-verify="required" required readonly="readonly"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">纬度</label>
+            <div class="layui-input-block">
+                <input id="latitude"  name="latitude" placeholder="" type="text" class="layui-input"
+                       maxlength="20" lay-verify="required" required readonly="readonly"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">有效距离</label>
+            <div class="layui-input-block">
+                <input name="distance" placeholder="请输入有效距离" type="text" class="layui-input"
+                       lay-verify="required" required/>
+            </div>
+        </div>
+        <!--显示百度地图-->
+        <div id='allmap' style='width: 1000px; height: 600px; position: absolute; display: none; margin-top: -380px;margin-left: -350px'></div>
+        <div class="layui-form-item text-right">
+            <button class="layui-btn layui-btn-primary" type="button" ew-event="closeDialog">取消</button>
+            <button class="layui-btn" lay-filter="placeFormSubmit" lay-submit>保存</button>
+        </div>
+    </form>
+
+
+</script>
+
+
+
+<!-- js部分 -->
+<script type="text/javascript" src="../../assets/libs/layui/layui.js"></script>
+<script type="text/javascript" src="../../assets/common.js"></script>
+<script>
+    layui.use(['layer', 'form', 'table', 'util', 'formSelects', 'admin','laydate'], function () {
+        var $ = layui.jquery;
+        var layer = layui.layer;
+        var form = layui.form;
+        var table = layui.table;
+        var util = layui.util;
+        var formSelects = layui.formSelects;
+        var admin = layui.admin;
+        var laydate=layui.laydate;
+        var mRoles = [];  // 全部角色
+
+        // 渲染表格
+        table.render({
+            elem: '#placeTable',
+            url: base_server + 'place/query',
+            method: 'post',
+            where: {
+                access_token: admin.getToken()
+            },
+            page: true,
+            cellMinWidth: 100,
+            cols: [[
+                {type: 'numbers'},
+                {field: 'name', title: '名称',width:120},
+                {field: 'relName', title: '准确地点',width:300},
+                {field: 'distance', title: '有效距离',width:150},
+                {
+                    templet: function (d) {
+                        return util.toDateString(d.createTime);
+                    }, title: '创建时间'
+                },
+                {field: 'statu', templet: '#tbaleState', title: '状态', unresize: true, width: 100},
+                {align: 'center', toolbar: '#tableBar', title: '操作', unresize: true, width: 200}
+            ]],
+            skin: 'line',
+            size: 'lg'
+        });
+
+        // 搜索按钮点击事件
+        $('#placeBtnSearch').click(function () {
+            var key = $('#sltKey').val();
+            var value = $('#edtSearch').val();
+            table.reload('placeTable', {where: {searchKey: key, searchValue: value}});
+        });
+
+        // 添加按钮点击事件
+        $('#placeBtnAdd').click(function () {
+            showAddModel();
+        });
+
+        // 工具条点击事件
+        table.on('tool(placeTable)', function (obj) {
+            var data = obj.data;
+            console.log(data);
+            var layEvent = obj.event;
+
+            if (layEvent === 'del') { // 删除
+                layer.confirm('确定删除此考勤地点吗？', function (i) {
+                    layer.close(i);
+                    layer.load(2);
+                    admin.req('place/delete/' + obj.data.id, {}, function (data) {
+                        layer.closeAll('loading');
+                        if (data.code == 200) {
+                            layer.msg(data.msg, {icon: 1});
+                            obj.del();
+                        } else {
+                            layer.msg(data.msg, {icon: 2});
+                        }
+                    }, 'DELETE');
+                });
+            } else if (layEvent === 'edit') { // 修改
+                showEditModel(data);
+            }
+        });
+
+        // 修改place状态
+        form.on('switch(ckState)', function (obj) {
+            layer.load(2);
+            admin.req('place/statu', {
+                id: obj.elem.value,
+                statu: obj.elem.checked ? 0 : 1
+            }, function (data) {
+                layer.closeAll('loading');
+                if (data.code == 200) {
+                    layer.msg(data.msg, {icon: 1});
+                } else {
+                    layer.msg(data.msg, {icon: 2});
+                    $(obj.elem).prop('checked', !obj.elem.checked);
+                    form.render('checkbox');
+                }
+            }, 'PUT');
+        });
+
+        // 显示表单弹窗
+        function showEditModel(data) {
+            layer.open({
+                type: 1,
+                area: '360px',
+                offset: '65px',
+                title: '修改考勤地点',
+                content: $('#placeForm').html(),
+                success: function (layero, index) {
+                    $(layero).children('.layui-layer-content').css('overflow', 'visible');
+                    // 回显place数据
+                    if (data) {
+                        form.val('placeForm', data);
+                    }
+                    // 表单提交事件
+                    form.on('submit(placeFormSubmit)', function (d) {
+                        layer.load(2);
+                        admin.req('place/update', d.field, function (res) {
+                            layer.closeAll('loading');
+                            if (res.code == 200) {
+                                layer.msg(res.msg, {icon: 1});
+                                layer.closeAll('page');
+                                table.reload('placeTable');
+                            } else {
+                                layer.msg(res.msg, {icon: 2});
+                            }
+                        }, 'PUT');
+                        return false;
+                    });
+                }
+            });
+            //显示百度地图
+            /*document.getElementById('relName').onfocus = allmap();
+            document.getElementById('relName').onblur = dismap();
+            function allmap() {
+                console.log("输入真实地址")
+                document.getElementById('allmap').style.display = 'block';
+            };
+            function dismap() {
+                document.getElementById('allmap').style.display = 'none';
+            }*/
+            document.getElementById('relName').onclick = function () {
+                if (document.getElementById('allmap').style.display == 'none') {
+                    document.getElementById('allmap').style.display = 'block';
+                } else {
+                    document.getElementById('allmap').style.display = 'none';
+                }
+            }
+            /*document.getElementById('relName').onblur=function (ev) {
+                console.log("失去焦点触发")
+                document.getElementById('allmap').style.display = 'none';
+            }*/
+            var map = new BMap.Map("allmap");
+            var geoc = new BMap.Geocoder();   //地址解析对象
+            var markersArray = [];
+            var geolocation = new BMap.Geolocation();
+
+
+            var point = new BMap.Point(104.0868470, 30.6540320);
+            map.centerAndZoom(point, 12); // 中心点
+            // 添加带有定位的导航控件
+            var navigationControl = new BMap.NavigationControl({
+                // 靠左上角位置
+                anchor: BMAP_ANCHOR_TOP_LEFT,
+                // LARGE类型
+                type: BMAP_NAVIGATION_CONTROL_LARGE,
+                // 启用显示定位
+                enableGeolocation: true
+            });
+            map.addControl(navigationControl);
+            // 添加定位控件
+            var geolocationControl = new BMap.GeolocationControl();
+            geolocationControl.addEventListener("locationSuccess", function(e){
+                // 定位成功事件
+                var address = '';
+                address += e.addressComponent.province;
+                address += e.addressComponent.city;
+                address += e.addressComponent.district;
+                address += e.addressComponent.street;
+                address += e.addressComponent.streetNumber;
+                alert("当前定位地址为：" + address);
+            });
+            geolocationControl.addEventListener("locationError",function(e){
+                // 定位失败事件
+                alert(e.message);
+            });
+            map.addControl(geolocationControl);
+
+            geolocation.getCurrentPosition(function (r) {
+                if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+                    var mk = new BMap.Marker(r.point);
+                    map.addOverlay(mk);
+                    map.panTo(r.point);
+                    map.enableScrollWheelZoom(true);
+                }
+                else {
+                    alert('failed' + this.getStatus());
+                }
+            }, {enableHighAccuracy: true})
+            map.addEventListener("click", showInfo);
+
+
+            //清除标识
+            function clearOverlays() {
+                if (markersArray) {
+                    for (i in markersArray) {
+                        map.removeOverlay(markersArray[i])
+                    }
+                }
+            }
+            //地图上标注
+            function addMarker(point) {
+                var marker = new BMap.Marker(point);
+                markersArray.push(marker);
+                clearOverlays();
+                map.addOverlay(marker);
+            }
+            //点击地图时间处理
+            function showInfo(e) {
+                document.getElementById('longitude').value = e.point.lng;
+                document.getElementById('latitude').value =  e.point.lat;
+                geoc.getLocation(e.point, function (rs) {
+                    var addComp = rs.addressComponents;
+                    var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
+                    if (confirm("确定要地址是" + address + "?")) {
+                        document.getElementById('allmap').style.display = 'none';
+                        document.getElementById('relName').value = address;
+                    }
+                });
+                addMarker(e.point);
+            }
+        }
+        //添加考勤地点 表格弹窗
+        function showAddModel() {
+            layer.open({
+                type: 1,
+                area: '360px',
+                offset: '65px',
+                title: '添加考勤地点',
+                content: $('#placeForm').html(),
+                success: function (layero, index) {
+                    $(layero).children('.layui-layer-content').css('overflow', 'visible');
+                    form.render('radio');
+                    // 表单提交事件
+                    form.on('submit(placeFormSubmit)', function (d) {
+                        layer.load(2);
+                        console.log(d);
+                        admin.req('place/insert', d.field, function (res) {
+                            layer.closeAll('loading');
+                            if (res.code == 200) {
+                                layer.msg(res.msg, {icon: 1});
+                                layer.closeAll('page');
+                                table.reload('placeTable');
+                            } else {
+                                layer.msg(res.msg, {icon: 2});
+                            }
+                        }, 'POST');
+                        return false;
+                    });
+                }
+            });
+
+            //显示百度地图
+            /*document.getElementById('relName').onfocus = allmap();
+            document.getElementById('relName').onblur = dismap();
+            function allmap() {
+                console.log("获取焦点")
+                document.getElementById('allmap').style.display = 'block';
+            }
+            function dismap() {
+                console.log("失去焦点")
+                document.getElementById('allmap').style.display = 'none';
+            }*/
+            document.getElementById('relName').onclick = function () {
+                if (document.getElementById('allmap').style.display == 'none') {
+                    document.getElementById('allmap').style.display = 'block';
+                } else {
+                    document.getElementById('allmap').style.display = 'none';
+                }
+            }
+            /*document.getElementById('relName').onblur=function (ev) {
+                console.log("失去焦点触发")
+                document.getElementById('allmap').style.display = 'none';
+            }*/
+
+            var map = new BMap.Map("allmap");
+            var geoc = new BMap.Geocoder();   //地址解析对象
+            var markersArray = [];
+            var geolocation = new BMap.Geolocation();
+
+
+            var point = new BMap.Point(104.0868470, 30.6540320);
+            map.centerAndZoom(point, 12); // 中心点
+            // 添加带有定位的导航控件
+            var navigationControl = new BMap.NavigationControl({
+                // 靠左上角位置
+                anchor: BMAP_ANCHOR_TOP_LEFT,
+                // LARGE类型
+                type: BMAP_NAVIGATION_CONTROL_LARGE,
+                // 启用显示定位
+                enableGeolocation: true
+            });
+            map.addControl(navigationControl);
+            // 添加定位控件
+            var geolocationControl = new BMap.GeolocationControl();
+            geolocationControl.addEventListener("locationSuccess", function(e){
+                // 定位成功事件
+                var address = '';
+                address += e.addressComponent.province;
+                address += e.addressComponent.city;
+                address += e.addressComponent.district;
+                address += e.addressComponent.street;
+                address += e.addressComponent.streetNumber;
+                alert("当前定位地址为：" + address);
+            });
+            geolocationControl.addEventListener("locationError",function(e){
+                // 定位失败事件
+                alert(e.message);
+            });
+            map.addControl(geolocationControl);
+
+            geolocation.getCurrentPosition(function (r) {
+                console.log("定位当前位置");
+                if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+                    var mk = new BMap.Marker(r.point);
+                    console.log("r====="+r);
+                    console.log(r.point);
+                    map.addOverlay(mk);
+                    map.panTo(r.point);
+                    map.enableScrollWheelZoom(true);
+                }
+                else {
+                    alert('failed' + this.getStatus());
+                }
+            }, {enableHighAccuracy: true})
+            map.addEventListener("click", showInfo);
+
+
+            //清除标识
+            function clearOverlays() {
+                if (markersArray) {
+                    for (i in markersArray) {
+                        map.removeOverlay(markersArray[i])
+                    }
+                }
+            }
+            //地图上标注
+            function addMarker(point) {
+                var marker = new BMap.Marker(point);
+                markersArray.push(marker);
+                clearOverlays();
+                map.addOverlay(marker);
+            }
+            //点击地图时间处理
+            function showInfo(e) {
+                document.getElementById('longitude').value = e.point.lng;
+                document.getElementById('latitude').value =  e.point.lat;
+                geoc.getLocation(e.point, function (rs) {
+                    var addComp = rs.addressComponents;
+                    var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
+                    if (confirm("确定要地址是" + address + "?")) {
+                        document.getElementById('allmap').style.display = 'none';
+                        document.getElementById('relName').value = address;
+                    }
+                });
+                addMarker(e.point);
+            }
+        }
+
+        // 获取所有角色
+        /*layer.load(2);
+        admin.req('role', {}, function (res) {
+            layer.closeAll('loading');
+            if (0 == res.code) {
+                mRoles = res.data;
+            } else {
+                layer.msg('获取角色失败', {icon: 2});
+            }
+        }, 'GET');*/
+
+    });
+</script>
+
+</body>
+</html>
