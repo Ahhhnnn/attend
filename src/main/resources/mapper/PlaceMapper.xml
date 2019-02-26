@@ -9,4 +9,6 @@
         update ts_place set name=#{name},rel_name=#{relName},longitude=#{longitude},latitude=#{latitude},distance=#{distance}
         where id =#{id}
     </update>
+
+
 </mapper>

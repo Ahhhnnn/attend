@@ -103,4 +103,17 @@ public class PlaceController {
             return new PageResult("修改失败", 400);
         }
     }
+
+    /**
+     * 查询状态正常的考勤地点
+     * @return
+     */
+    @RequestMapping("/queryNormalPlace")
+    public PageResult queryNormalPlace(){
+        EntityWrapper entityWrapper=new EntityWrapper();
+        entityWrapper.eq("statu",0);
+        List<Place> places=placeService.selectList(entityWrapper);
+        PageResult pageResult=new PageResult(places,places.size());
+        return pageResult;
+    }
 }

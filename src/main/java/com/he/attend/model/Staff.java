@@ -17,6 +17,8 @@ public class Staff {
 
     private String phone;//手机号
 
+    private String password;//密码
+
     private String email;//邮箱
 
     private String birthday;//生日

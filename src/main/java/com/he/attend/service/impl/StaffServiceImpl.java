@@ -18,4 +18,9 @@ public class StaffServiceImpl extends ServiceImpl<StaffMapper, Staff> implements
     public Staff getByStaffName(String staffName) {
         return baseMapper.getByStaffName(staffName);
     }
+
+    @Override
+    public Staff queryByStaffId(Integer staffId) {
+        return baseMapper.queryByStaffId(staffId);
+    }
 }

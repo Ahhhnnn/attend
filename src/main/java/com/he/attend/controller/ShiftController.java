@@ -116,4 +116,16 @@ public class ShiftController {
         }
         return new PageResult("新增失败",400);
     }
+
+    /**
+     * 查询所有状态为0的班次
+     * @return
+     */
+    @RequestMapping("queryNormlShifts")
+    public PageResult<Shift> queryNormlShifts(){
+        EntityWrapper wrapper=new EntityWrapper();
+        wrapper.eq("state",0);
+        List<Shift> shiftList=shiftService.selectList(wrapper);
+        return new PageResult<Shift>(shiftList,shiftList.size());
+    }
 }

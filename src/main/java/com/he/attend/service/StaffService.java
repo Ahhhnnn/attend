@@ -9,4 +9,5 @@ public interface StaffService extends IService<Staff> {
 
     Staff getByStaffName(String staffName);
 
+    Staff queryByStaffId(Integer staffId);
 }

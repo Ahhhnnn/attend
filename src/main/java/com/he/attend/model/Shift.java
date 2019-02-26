@@ -13,6 +13,7 @@ public class Shift {
     @TableId
     private Integer shiftId;//班次id
     private String shiftName;//班次名称
+    private String color;//班次颜色
     private String beginTime;//班次开始时间
     private String endTime;//班次结束时间
     private Integer state;//状态
