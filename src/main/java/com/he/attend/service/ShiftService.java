@@ -9,4 +9,5 @@ public interface ShiftService extends IService<Shift>{
     void updateById(Integer state,Integer shiftId);
     void deleteById(Integer shiftId);
     void update(Shift shift);
+    Shift getShiftById(Integer shiftId);
 }

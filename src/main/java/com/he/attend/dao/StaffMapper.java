@@ -18,4 +18,5 @@ public interface StaffMapper extends BaseMapper<Staff> {
 
     Staff queryByStaffId(@Param("staffId") Integer staffId);
 
+    List<Staff> loginByPsd(@Param("phone") String phone,@Param("password") String password);
 }

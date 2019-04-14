@@ -10,4 +10,8 @@
     <select id="queryByStaffId" parameterType="integer" resultType="com.he.attend.model.Staff">
         select * from ts_staff where staff_id=#{staffId}
     </select>
+    
+    <select id="loginByPsd" resultType="com.he.attend.model.Staff">
+        select * from ts_staff where phone=#{phone} and password=#{password}
+    </select>
 </mapper>

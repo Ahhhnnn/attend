@@ -9,34 +9,24 @@
     <link rel="stylesheet" href="../../assets/common.css" media="all">
 </head>
 <body>
-    <h1>展示人员排班信息</h1>
+    <!--<h1>展示人员排班信息</h1>-->
     <div class="layui-fluid">
         <div class="layui-card">
-            <div class="layui-card-body layui-form">
-                <div style="display: inline-block;width: 100px;margin-right: 10px;">
-                    <select id="sltKey">
-                        <option value="" selected="selected">搜索条件</option>
-                        <option value="deptName">部门名称</option>
-                        <option value="staffName">员工姓名</option>
+            <!--<div class="layui-card-body layui-form">
 
-                    </select>
-                </div>
-                <div style="display: inline-block;margin-right: 10px;width: 160px;">
-                    <input id="edtSearch" class="layui-input" type="text" placeholder="输入关键字"/>
-                </div>
-                <div class="layui-inline">
-                    <button id="placeBtnSearch" class="layui-btn icon-btn"><i class="layui-icon">&#xe615;</i>搜索</button>
-                    <button id="calendarSave" class="layui-btn icon-btn"><i class="layui-icon">&#xe654;</i>保存</button>
-                </div>
-            </div>
+
+            </div>-->
+            <div id='calendar'style="float: right">
+                   <iframe id="calendarhtml" frameborder="0" width="1250px" height="600px" src="../../fullcalendar-3.6.2/demos/background-events.html"></iframe>
+               </div>
         </div>
 
 
     </div>
-    <div id="showCalendar">
+    <!--<div id="showCalendar">
 
-    </div>
-    <table class="layui-table" id="calendarTable" lay-filter="calendarTable">
+    </div>-->
+   <!-- <table class="layui-table" id="calendarTable" lay-filter="calendarTable">-->
 
     </table>
 <div></div>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset='utf-8' />
+	<link href='../fullcalendar.min.css' rel='stylesheet' />
+	<link href='../fullcalendar.print.min.css' rel='stylesheet' media='print' />
+	<script src='../lib/moment.min.js'></script>
+	<script src='../lib/jquery.min.js'></script>
+	<script src='../lib/jquery-ui.min.js'></script>
+	<script src='../fullcalendar.min.js'></script>
+<script>
+	$(document).ready(function() {
+
+		$('#calendar').fullCalendar({
+			header: {
+				left: 'prev,next today',
+				center: 'title',
+				right: 'month,agendaWeek,agendaDay'
+			},
+            monthNames: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+            monthNamesShort: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+            dayNames: ["周日", "周一", "周二", "周三", "周四", "周五", "周六"],
+            dayNamesShort: ["周日", "周一", "周二", "周三", "周四", "周五", "周六"],
+            today: ["今天"],
+            firstDay: 1,
+            buttonText: {
+                today: '今天',
+                month: '月',
+                week: '周',
+                day: '日'
+            },
+			defaultDate: '2017-10-12',
+			navLinks: true, // can click day/week names to navigate views
+			businessHours: true, // display business hours
+			editable: true,
+            eventLimit: true, // allow "more" link when too many events
+			events: function (start, end, timezone, callback) {
+			    console.log(start+" "+end)
+				$.ajax({
+                    url: 'http://localhost:8888/'+ 'appCalendar/querytest',
+                    dataType: 'json',
+                    data: {
+                        // our hypothetical feed requires UNIX timestamps
+                        startTime: start.unix(),
+                        endTime: end.unix()
+                    },
+                    success: function(doc) {
+                        console.log("查询到的排班:"+doc.title);
+                        var events = [];
+
+                        events.push({
+							title:doc.title,
+							start:doc.start,
+						});
+                        callback(events);
+                    }
+                });
+            }/*[
+				{
+					title: 'Business Lunch',
+					start: '2017-10-03T13:00:00',
+					constraint: 'businessHours'
+				},
+				{
+					title: 'Meeting',
+					start: '2017-10-13T11:00:00',
+					constraint: 'availableForMeeting', // defined below
+					color: '#257e4a'
+				},
+				{
+					title: 'Conference',
+					start: '2017-10-18',
+					end: '2017-10-20'
+				},
+				{
+					title: 'Party',
+					start: '2017-10-29T20:00:00'
+				},
+
+				// areas where "Meeting" must be dropped
+				{
+					id: 'availableForMeeting',
+					start: '2017-10-11T10:00:00',
+					end: '2017-10-11T16:00:00',
+					rendering: 'background'
+				},
+				{
+					id: 'availableForMeeting',
+					start: '2017-10-13T10:00:00',
+					end: '2017-10-13T16:00:00',
+					rendering: 'background'
+				},
+
+				// red areas where no events can be dropped
+				{
+					start: '2017-10-24',
+					end: '2017-10-28',
+					overlap: false,
+					rendering: 'background',
+					color: '#ff9f89'
+				},
+				{
+					start: '2017-10-06',
+					end: '2017-10-08',
+					overlap: false,
+					rendering: 'background',
+					color: '#ff9f89'
+				}
+			]*/
+			/*{
+				url:'http://localhost:8888/'+ 'appCalendar/querytest',
+				error: function() {
+					$('#script-warning').show();
+				}
+			},
+            loading: function(bool) {
+                $('#loading').toggle(bool);
+            }*/
+			
+		});
+		
+	});
+
+</script>
+<style>
+
+	body {
+		margin: 40px 10px;
+		padding: 0;
+		font-family: "Lucida Grande",Helvetica,Arial,Verdana,sans-serif;
+		font-size: 14px;
+	}
+
+	#calendar {
+		max-width: 900px;
+		margin: 0 auto;
+	}
+
+</style>
+</head>
+<body>
+
+	<div id='calendar'></div>
+
+</body>
+</html>

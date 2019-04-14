@@ -128,4 +128,18 @@ public class ShiftController {
         List<Shift> shiftList=shiftService.selectList(wrapper);
         return new PageResult<Shift>(shiftList,shiftList.size());
     }
+    /**
+     * 查询所有启用的班次
+     * @return
+     */
+    @RequestMapping("queryAll")
+    public PageResult<Shift> queryAll(){
+
+        EntityWrapper entityWrapper=new EntityWrapper();
+        entityWrapper.eq("state",0);
+
+        List<Shift> shiftList= shiftService.selectList(entityWrapper);
+        return new PageResult<>(200,"查询成功",shiftList.size(),shiftList);
+    }
+
 }

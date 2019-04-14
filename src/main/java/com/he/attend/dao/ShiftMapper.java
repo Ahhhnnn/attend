@@ -13,4 +13,5 @@ public interface ShiftMapper extends BaseMapper<Shift> {
     void updateById(@Param("state") Integer state, @Param("shiftId") Integer shiftId);
     void deleteById(@Param("shiftId")Integer shiftId);
     void update(Shift shift);
+    Shift getShiftById(Integer shiftId);
 }

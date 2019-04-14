@@ -13,4 +13,5 @@ import java.util.List;
 public interface PlaceMapper extends BaseMapper<Place> {
     void updateById(@Param("statu") Integer statu, @Param("id") Integer id);
     void update(Place place);
+    String queryPlaceNameById(Integer id);
 }

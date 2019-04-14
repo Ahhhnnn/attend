@@ -15,4 +15,8 @@
     <update id="update" parameterType="com.he.attend.model.Shift">
       UPDATE ts_shift set shift_name=#{shiftName},begin_time=#{beginTime},end_time=#{endTime} where shift_id=#{shiftId}
     </update>
+
+    <select id="getShiftById" resultType="com.he.attend.model.Shift">
+        select * from ts_shift where shift_id=#{shiftId}
+    </select>
 </mapper>

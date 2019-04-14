@@ -10,11 +10,13 @@ import com.he.attend.service.DeptService;
 import com.he.attend.service.StaffService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -71,5 +73,23 @@ public class AttendCalendarController {
 
         return jsonObject;
     }
+
+    @RequestMapping("/queryCalendar")
+    public PageResult queryCalendar(Integer staffId,String date){
+
+        EntityWrapper entityWrapper=new EntityWrapper();
+        entityWrapper.eq("staff_id",staffId);
+        entityWrapper.eq("day",date);
+
+        List<AttendCalendar> attendCalendars= calendarService.selectList(entityWrapper);
+        if(!CollectionUtils.isEmpty(attendCalendars)){//不为空说明 用户今天有排班
+            return new PageResult(200,"success",attendCalendars.size(),attendCalendars);
+        }
+        //若为空说明用户今天无排班
+        return new  PageResult("用户今日无排班",400);
+    }
+
+
+
 
 }

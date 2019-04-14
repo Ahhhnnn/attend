@@ -116,4 +116,16 @@ public class PlaceController {
         PageResult pageResult=new PageResult(places,places.size());
         return pageResult;
     }
+
+    /**
+     * 查询所有statu为0 的考勤地点
+     * @return
+     */
+    @RequestMapping("queryAll")
+    public PageResult<Place> queryAll(){
+        EntityWrapper entityWrapper=new EntityWrapper();
+        entityWrapper.eq("statu",0);
+        List<Place> placeList=placeService.selectList(entityWrapper);
+        return new PageResult<>(200,"查询考勤地点成功",placeList.size(),placeList);
+    }
 }

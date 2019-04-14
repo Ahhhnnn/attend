@@ -7,18 +7,23 @@ import com.he.attend.common.JsonResult;
 import com.he.attend.common.PageResult;
 import com.he.attend.model.Attend;
 import com.he.attend.model.Dept;
+import com.he.attend.model.Rule;
 import com.he.attend.model.Staff;
 import com.he.attend.service.DeptService;
+import com.he.attend.service.RuleService;
 import com.he.attend.service.StaffService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.digester.Rules;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -29,6 +34,8 @@ public class DeptController {
     @Autowired
     private StaffService staffService;
 
+    @Autowired
+    private RuleService ruleService;
     /**
      * 新增部门
      * @param dept
@@ -198,5 +205,48 @@ public class DeptController {
             }
         }
         return false;
+    }
+
+    /**
+     * 查询所有状态正常且未删除的部门
+     * @return
+     */
+    @RequestMapping("/queryAllStatu")
+    public PageResult<Dept> queryAllStatu(){
+        EntityWrapper entity=new EntityWrapper();
+        entity.eq("dr",0);
+        entity.eq("statu",0);
+        List<Dept> depts=deptService.selectList(entity);
+        return new PageResult<>(200,"查询成功",depts.size(),depts);
+    }
+
+
+    /**
+     * 新增规则 调用 去重的部门
+     * @return
+     */
+    @RequestMapping("/queryAllNotRepact")
+    public PageResult<Dept> queryAllNotRepact(){
+        EntityWrapper entity=new EntityWrapper();
+        entity.eq("dr",0);
+        entity.eq("statu",0);
+        List<Dept> depts=deptService.selectList(entity);
+        List<Rule> ruleList=ruleService.query();
+        List<String> deptIdsString=ruleList.stream().map(Rule->Rule.getDeptIds()).collect(Collectors.toList());
+        List<Integer> deptIds=new ArrayList<>();
+        for(String deptId:deptIdsString){
+            for(String deptid:deptId.split(",")){
+                deptIds.add(Integer.valueOf(deptid));
+            }
+        }
+        List<Dept> finalDepts=new ArrayList<>();
+        finalDepts.addAll(depts);
+        //去重
+        for(Dept dept:depts){
+            if(deptIds.contains(dept.getDeptId())){
+                finalDepts.remove(dept);
+            }
+        }
+        return new PageResult<>(200,"查询成功",finalDepts.size(),finalDepts);
     }
 }

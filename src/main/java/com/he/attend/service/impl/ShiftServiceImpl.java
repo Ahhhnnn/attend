@@ -27,4 +27,9 @@ public class ShiftServiceImpl extends ServiceImpl<ShiftMapper,Shift> implements 
     public void update(Shift shift) {
         baseMapper.update(shift);
     }
+
+    @Override
+    public Shift getShiftById(Integer shiftId) {
+        return baseMapper.getShiftById(shiftId);
+    }
 }

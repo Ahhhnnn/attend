@@ -1,5 +1,6 @@
 package com.he.attend;
 
+import com.he.attend.common.utils.DataUtils;
 import com.he.attend.service.CalendarService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,6 +26,13 @@ public class AttendApplicationTests {
 	{
 		List<Integer> list=calendarService.queryStaffIds();
 		System.out.println(list);
+	}
+
+	@Test
+	public void testGetDays(){
+		DataUtils dataUtils=new DataUtils();
+		List<String> daysList=dataUtils.getDays("2018-04-12","2018-05-20");
+		System.out.println(daysList);
 	}
 }
 

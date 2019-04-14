@@ -130,11 +130,7 @@
                 {field: 'color', title: '班次颜色'},
                 {field: 'beginTime', title: '开始时间'},
                 {field: 'endTime', title: '结束时间'},
-                {
-                    templet: function (d) {
-                        return util.toDateString(d.createTime);
-                    }, title: '创建时间'
-                },
+                {field:'createTime',title:'创建时间'},
                 {field: 'state', templet: '#tbaleState', title: '状态', unresize: true, width: 100},
                 {align: 'center', toolbar: '#tableBar', title: '操作', unresize: true, width: 200}
             ]],

@@ -23,7 +23,7 @@ public class Staff {
 
     private String birthday;//生日
 
-    private String deptId;//部门id
+    private Integer deptId;//部门id
 
     private String deptName;    //部门名称
 

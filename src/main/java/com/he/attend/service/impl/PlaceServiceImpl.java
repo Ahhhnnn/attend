@@ -23,4 +23,9 @@ public class PlaceServiceImpl extends ServiceImpl<PlaceMapper, Place> implements
     public void update(Place place) {
         baseMapper.update(place);
     }
+
+    @Override
+    public String queryPlaceNameById(Integer id) {
+        return baseMapper.queryPlaceNameById(id);
+    }
 }

@@ -25,6 +25,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * 日期时间工具类
@@ -278,5 +279,15 @@ public class DateUtil {
 			}
 		}
 		return age;
+	}
+
+	/**
+	 * 将unix时间戳 转换为 String格式
+	 * @return
+	 */
+	public static String getUnixToString(String unixTime,String pattrn){
+		SimpleDateFormat sim=new SimpleDateFormat(pattrn, Locale.CHINA);
+		Long l=Long.parseLong(unixTime)*1000;
+		return sim.format(new Date(l));
 	}
 }

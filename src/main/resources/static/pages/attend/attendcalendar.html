@@ -7,43 +7,143 @@
     <link rel="stylesheet" href="../../assets/libs/layui/css/layui.css" media="all">
     <link rel="stylesheet" href="../../assets/module/formSelects/formSelects-v4.css" media="all">
     <link rel="stylesheet" href="../../assets/common.css" media="all">
+    <link rel="stylesheet" href="../../assets/libs/jquery/jquery-ui.css">
+    <script src="../../assets/libs/jquery/jquery-3.2.1.min.js"></script>
+    <script src="../../assets/libs/jquery/jquery-ui.js"></script>
+    <script src="../../assets/vue.min.js"></script>
 </head>
+<style>
+
+</style>
 <body>
 <div class="layui-fluid">
     <div class="layui-card">
         <div class="layui-card-body layui-form">
             <div style="display: inline-block;width: 100px;margin-right: 10px;">
                 <select id="sltKey">
+
                     <option value="" selected="selected">搜索条件</option>
-                    <option value="deptName">部门名称</option>
-                    <option value="staffName">员工姓名</option>
+                    <option value="deptName">规则名称</option>
+                    <option value="staffName"></option>
 
                 </select>
+
             </div>
             <div style="display: inline-block;margin-right: 10px;width: 160px;">
                 <input id="edtSearch" class="layui-input" type="text" placeholder="输入关键字"/>
             </div>
             <div class="layui-inline">
                 <button id="placeBtnSearch" class="layui-btn icon-btn"><i class="layui-icon">&#xe615;</i>搜索</button>
-                <button id="calendarEdit" class="layui-btn icon-btn"><i class="layui-icon">&#xe654;</i>编辑</button>
-                <button id="calendarSave" class="layui-btn icon-btn"><i class="layui-icon">&#xe654;</i>保存</button>
+                <button id="ruleAdd" class="layui-btn icon-btn"><i class="layui-icon">&#xe654;</i>新增</button>
             </div>
         </div>
-        <div style="margin-left: 20px">
-            <!--展示班次-->
-            <div class="layui-inline" id="shifts">
-                <!--<span style="color: #FFB800;font-size: large">班次展示</span><br>-->
-                <br>
+
+        <div style="margin-left: 15px">
+
+            <div style="float: left">
+                <!--展示班次-->
+                <div class="layui-inline" id="shifts" >
+                    <!--<span style="color: #FFB800;font-size: large">班次展示</span><br>-->
+                    <br>
+                </div>
+
+                <div>
+                    <!--展示rule-->
+                    <table class="layui-table" id="ruleTable" lay-filter="ruleTable"></table>
+                </div>
+                <!--<div id='calendar'style="float: right">
+                    <iframe id="calendarhtml" frameborder="0" width="1250px" height="600px" src="../../fullcalendar-3.6.2/demos/external-dragging.html"></iframe>
+                </div>-->
+
+
+
             </div>
+            <!--<div id="calendar" style="margin-top: 15px">
+                <table class="layui-table" style="table-layout:fixed">
+                    <thead>
+                    <tr>
+                        <th width="50px">姓名</th>
+                        <th width="100px">考勤地点</th>
+                        <th v-for="value in days" width="100px">{{value}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        &lt;!&ndash; 查询指定月份人员的排班 循环展示在表格上&ndash;&gt;
+                        <td>贤心</td>
+                    </tr>
 
-            <table class="layui-table" id="calendarTable" lay-filter="calendarTable">
-                <!--<th lay-data="{field:'city', edit: 'text', minWidth: 100}">城市</th>
-                <th lay-data="{field:'experience', sort: true, edit: 'text'}">积分</th>-->
-            </table>
-
+                    </tbody>
+                </table>
+            </div>-->
         </div>
     </div>
 
+    <!-- 表格操作列 -->
+    <script type="text/html" id="tableBar">
+        <a class="layui-btn layui-btn-primary layui-btn-sm" lay-event="edit">修改</a>
+        <a class="layui-btn layui-btn-danger layui-btn-sm" lay-event="del">删除</a>
+    </script>
+
+    <!-- 表单弹窗 -->
+    <script type="text/html" id="ruleForm">
+        <div>
+        <form lay-filter="ruleForm" class="layui-form model-form" id="rulefrom">
+            <input name="ruleId" type="hidden"/>
+            <div class="layui-form-item">
+                <label class="layui-form-label">规则名称</label>
+                <div class="layui-input-block">
+                    <input name="ruleName" placeholder="请输入规则名称" type="text" class="layui-input"
+                           maxlength="20" lay-verify="required" required/>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">考勤班次</label>
+                <div class="layui-input-block">
+                    <select id="selShift" name="shiftId" xm-select="selShift" xm-select-skin="default" lay-verify="required">
+                       <!-- <option value="1">测试</option>-->
+                        <option value="">请选择考勤班次</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">考勤地点</label>
+                <div class="layui-input-block">
+                    <select id="placeSel" name="placeId" xm-select="selPlace" xm-select-skin="default" lay-verify="required">
+                        <option value="">请选择考勤地点</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">适用部门</label>
+                <div class="layui-input-block">
+                    <select name="deptIds" xm-select="selDept" xm-select-skin="default">
+
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">适用人员</label>
+                <div class="layui-input-block">
+                    <select name="staffIds" xm-select="selStaff" xm-select-skin="default">
+
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">排班日期</label>
+                <div class="layui-input-block">
+                    <input type="text" class="layui-input" id="days" name="days">
+                </div>
+            </div>
+
+            <div class="layui-form-item text-right">
+                <button class="layui-btn layui-btn-primary" type="button" ew-event="closeDialog">取消</button>
+                <button class="layui-btn" lay-filter="ruleFormSubmit" lay-submit>保存</button>
+            </div>
+        </form>
+        </div>
+    </script>
     <script type="text/html" id="placeSelect">
 
             <div style="display: inline-block;width: 100px;margin-right: 10px;">
@@ -61,6 +161,41 @@
 <!-- js部分 -->
 <script type="text/javascript" src="../../assets/libs/layui/layui.js"></script>
 <script type="text/javascript" src="../../assets/common.js"></script>
+<!--<script>
+
+    function getEveyDay(year,month) {
+        var dayArry = [];//传入月每一天
+        var date=new Date();
+        var relmonth=month+1;
+        var d = new Date(year, month+1, 0);
+        var Monthcount=d.getDate();//当前月天数
+        for(var i=1;i<=Monthcount;i++){
+            dayArry.push(relmonth+"/"+i+"日"+" "+getXQ(year,month,i));
+        }
+        console.log("打印dayArray");
+        for(var i=0;i<dayArry.length;i++){
+            console.log(dayArry[i]);
+        }
+        return dayArry;
+    }
+
+    function getXQ(year,month,day) {
+        var a = new Array("日", "一", "二", "三", "四", "五", "六");
+        var week = new Date(year,month,day).getDay();
+        var str = "星期"+ a[week];
+        console.log(week+"day"+year+"年"+ month+"月"+day+"日" +"是"+str);
+        return str;
+    }
+    var day=getEveyDay(2019,2);
+    console.log(day);
+
+    new Vue({
+        el:'#calendar',
+        data:{
+            days:day
+        }
+    })
+</script>-->
 <script>
     layui.use(['layer', 'form', 'table', 'util', 'formSelects', 'admin','laydate'], function () {
         var $ = layui.jquery;
@@ -75,11 +210,108 @@
         var shiftslength=0;
         var access_token = admin.getToken();
         var places=null;
+        var mRules=[];//所有规则
+        var mShifts=[];//所有班次 启用
+        var mPlaces=[];//所有考勤地点 启用
+        var mStaffs=[];//所有状态正常员工
+        var mStaffsNotRepact=[];//去重的员工
+        var mDepts=[];//所有正常的部门
+        var mDeptsNotRepact=[];//去重的正常的部门
 
 
+
+        //监听添加按钮点击
+        $('#ruleAdd').click(function () {
+            showAddModel();
+        });
+        //添加规则 表格弹窗
+        function showAddModel() {
+            layer.open({
+                type: 1,
+                area: '360px',
+                offset: '50px',
+                title: '新增排班',
+                content: $('#ruleForm').html(),
+                success: function (layero, index) {
+                    $(layero).children('.layui-layer-content').css('overflow', 'visible');
+                    form.render();
+                    // 渲染角色下拉框
+                    /*var roleSelData = new Array();
+                    for (var i = 0; i < mRoles.length; i++) {
+                        roleSelData.push({name: mRoles[i].roleName, value: mRoles[i].roleId});
+                    }
+                    formSelects.data('selRole', 'local', {arr: roleSelData});*/
+                    // 回显shift数据
+                    /* if (data) {
+                         //form.val('shiftForm', data);
+                         /!*var rds = new Array();
+                         for (var i = 0; i < data.roles.length; i++) {
+                             rds.push(data.roles[i].roleId);
+                         }
+                         formSelects.value('selRole', rds);  // 回显多选框*!/
+                     }*/
+                    //回显shift
+                    var shiftSelData=new Array();
+                    for (var i=0;i<mShifts.length;i++){
+                        shiftSelData.push({name:mShifts[i].shiftName,value:mShifts[i].shiftId});
+                    }
+                    for(var i=0;i<shiftSelData.length;i++){
+                       $('#selShift').append("<option value='"+shiftSelData[i].value+"'>"+shiftSelData[i].name+"</option>");
+                    }
+                    //回显place
+                    var placeSelData=new Array();
+                    for (var i=0;i<mPlaces.length;i++){
+                        placeSelData.push({name:mPlaces[i].name,value:mPlaces[i].id});
+                    }
+                    for(var i=0;i<placeSelData.length;i++){
+                        $('#placeSel').append("<option value='"+placeSelData[i].value+"'>"+placeSelData[i].name+"</option>");
+                    }
+                    console.log(document.getElementById('placeSel'))
+                    //回显staff
+                    var staffSelData=new Array();
+                    for (var i=0;i<mStaffsNotRepact.length;i++){
+                        staffSelData.push({name:mStaffsNotRepact[i].staffName,value:mStaffsNotRepact[i].staffId});
+                    }
+                    formSelects.data('selStaff','local',{arr:staffSelData});
+
+                    //回显depts
+                    var deptSelData=new Array();
+                    for (var i=0;i<mDeptsNotRepact.length;i++){
+                        deptSelData.push({name:mDeptsNotRepact[i].deptName,value:mDeptsNotRepact[i].deptId});
+                    }
+                    formSelects.data('selDept','local',{arr:deptSelData});
+                    form.render('select');
+                    // 表单提交事件
+                    form.on('submit(ruleFormSubmit)', function (d) {
+                        //d.field.roleIds = formSelects.value('selRole', 'valStr');
+                        layer.load(2);
+                        console.log(d);
+                        admin.req('rule/insert', d.field, function (res) {
+                            layer.closeAll('loading');
+                            if (res.code == 200) {
+                                layer.msg(res.msg, {icon: 1});
+                                layer.closeAll('page');
+                                table.reload('ruleTable');
+                            } else {
+                                layer.msg(res.msg, {icon: 2});
+                            }
+                        }, 'POST');
+                        return false;
+                    });
+                }
+            });
+            form.render();
+            //执行一个laydate实例
+            //排班日期输入框
+            laydate.render({
+                elem: '#days', //指定元素
+                range:true
+            });
+
+
+        }
         //获取所有状态正常的班次
         admin.req('shift/queryNormlShifts', {}, function (res) {
-            console.log("查询所有状态为0的班次");
             shifts=res.data;//所有状态为0的班次
             console.log("length$$$"+shifts.length);
             shiftslength=shifts.length;
@@ -93,17 +325,12 @@
         }, 'POST');
 
 
-        //获取所有状态正常的考勤地点
-            admin.req('place/queryNormalPlace', {}, function (res) {
-                console.log("查询所有状态正常的考勤班次");
-                places=res.data;
-            }, 'POST');
 
 
         // 渲染表格
         table.render({
-            elem: '#calendarTable',
-            url: base_server + 'calendar/queryCalendars',
+            elem: '#ruleTable',
+            url: base_server + 'rule/query',
             method: 'post',
             where: {
                 access_token: admin.getToken()
@@ -112,13 +339,39 @@
             cellMinWidth: 100,
             cols: [[
                 {type: 'numbers'},
-                {field: 'staffName', title: '姓名', fixed: 'left'},
-                {field: 'place', title: '考勤地点', fixed: 'left',edit:'text',event:'placeClick'}
+                {field: 'ruleName', title: '规则名称'},
+                {field: 'shiftName', title: '班次名称'},
+                {field: 'days', title: '排班日期',width:230},
+                {field: 'placeName', title: '考勤地点',width:160},
+                {
+                    templet: function (d) {
+                        var str="";
+                        if(d.depts!=null) {
+                            for (var i = 0; i < d.depts.length; i++) {
+                                str += d.depts[i].deptName+" ";
+                            }
+                        }
+                        return str;
+                    }, title: '适用部门',width:150
+                },
+                {
+                    templet: function (d) {
+                        var str="";
+                        if(d.staffs!=null) {
+                            for (var i = 0; i < d.staffs.length; i++) {
+                                str += d.staffs[i].staffName+" ";
+                            }
+                        }
+                        return str;
+                    }, title: '适用人员'
+                },
+                {field: 'createTime', title: '创建时间',width:190},
+                {align: 'center', toolbar: '#tableBar', title: '操作', unresize: true, width: 230}
             ]],
             skin: 'line',
             size: 'lg',
             done:function (res, curr, count) {
-                var datas=res.data;
+
             }
         });
 
@@ -144,55 +397,202 @@
             layer.msg('[ID: '+ data.id +'] ' + field + ' 字段更改为：'+ value);
         });*/
 
-        table.on('tool(calendarTable)',function (obj) {
-            var data=obj.date;
-            if(obj.event==='placeClick'){
-                layer.open({
-                    type: 1,
-                    title: false,
-                    content: $('#placeSelect').html(),
-                    success: function (layero, index) {
+        // 工具条点击事件
+        table.on('tool(ruleTable)', function (obj) {
+            var data = obj.data;
+            console.log(data);
+            var layEvent = obj.event;
 
-                    }
+            if (layEvent === 'del') { // 删除
+                layer.confirm('确定删除此规则吗？', function (i) {
+                    layer.close(i);
+                    layer.load(2);
+                    admin.req('rule/delete/' + obj.data.ruleId, {}, function (data) {
+                        layer.closeAll('loading');
+                        if (data.code == 200) {
+                            layer.msg(data.msg, {icon: 1});
+                            obj.del();
+                        } else {
+                            layer.msg(data.msg, {icon: 2});
+                        }
+                    }, 'DELETE');
                 });
-            }
-            //渲染考勤地点
-            for (var i=0;i<places.length;i++) {
-                /*<option value="" selected="selected">考勤地点</option>*/
-                console.log("添加地点选项"+places[i].name)
-                console.log("<option value=\" "+places[i].name+" \">+" +places[i].name+"</option>" +" <br>")
-                document.getElementById("attendPlace").innerHTML += "<option value=\" "+places[i].name+" \"> " +places[i].name+"</option>" +" <br>";
+            } else if (layEvent === 'edit') { // 修改
+                showEditModel(data);
             }
         });
 
-        // 搜索按钮点击事件
-        $('#placeBtnSearch').click(function () {
-            var key = $('#sltKey').val();
-            var value = $('#edtSearch').val();
-            table.reload('placeTable', {where: {searchKey: key, searchValue: value}});
-        });
 
+        //修改规则 表格弹窗
+        function showEditModel(data) {
+            layer.open({
+                type: 1,
+                area: '360px',
+                offset: '50px',
+                title: '修改规则',
+                content: $('#ruleForm').html(),
+                success: function (layero, index) {
+                    $(layero).children('.layui-layer-content').css('overflow', 'visible');
+                    form.render();
+                    //回显shift
+                    var shiftSelData=new Array();
+                    for (var i=0;i<mShifts.length;i++){
+                        shiftSelData.push({name:mShifts[i].shiftName,value:mShifts[i].shiftId});
+                    }
+                    for(var i=0;i<shiftSelData.length;i++){
+                        $('#selShift').append("<option value='"+shiftSelData[i].value+"'>"+shiftSelData[i].name+"</option>");
+                    }
+                    //回显place
+                    var placeSelData=new Array();
+                    for (var i=0;i<mPlaces.length;i++){
+                        placeSelData.push({name:mPlaces[i].name,value:mPlaces[i].id});
+                    }
+                    for(var i=0;i<placeSelData.length;i++){
+                        $('#placeSel').append("<option value='"+placeSelData[i].value+"'>"+placeSelData[i].name+"</option>");
+                    }
+                    console.log(document.getElementById('placeSel'))
+                    //回显staff
+                    var staffSelData=new Array();
+                    for (var i=0;i<mStaffs.length;i++){
+                        staffSelData.push({name:mStaffs[i].staffName,value:mStaffs[i].staffId});
+                    }
+                    formSelects.data('selStaff','local',{arr:staffSelData});
 
-        // 修改place状态
-        form.on('switch(ckState)', function (obj) {
-            layer.load(2);
-            admin.req('place/statu', {
-                id: obj.elem.value,
-                statu: obj.elem.checked ? 0 : 1
-            }, function (data) {
-                layer.closeAll('loading');
-                if (data.code == 200) {
-                    layer.msg(data.msg, {icon: 1});
-                } else {
-                    layer.msg(data.msg, {icon: 2});
-                    $(obj.elem).prop('checked', !obj.elem.checked);
-                    form.render('checkbox');
+                    //回显depts
+                    var deptSelData=new Array();
+                    for (var i=0;i<mDepts.length;i++){
+                        deptSelData.push({name:mDepts[i].deptName,value:mDepts[i].deptId});
+                    }
+                    formSelects.data('selDept','local',{arr:deptSelData});
+                    // 回显rule数据
+                    if (data) {
+                        console.log(data);
+                        form.val('ruleForm', data);
+                        var staffs = new Array();
+                        var depts=new Array();
+                        for (var i = 0; i < data.staffs.length; i++) {
+                            staffs.push(data.staffs[i].staffId);
+                        }
+                        for(var j=0;j<data.depts.length;j++){
+                            depts.push(data.depts[j].deptId);
+                        }
+                        formSelects.value('selDept', depts);  // 回显多选框
+                        formSelects.value('selStaff',staffs);
+                    }
+                    form.render('select');
+                    // 表单提交事件
+                    form.on('submit(ruleFormSubmit)', function (d) {
+                        //d.field.roleIds = formSelects.value('selRole', 'valStr');
+                        layer.load(2);
+                        console.log(d);
+                        admin.req('rule/update', d.field, function (res) {
+                            layer.closeAll('loading');
+                            if (res.code == 200) {
+                                layer.msg(res.msg, {icon: 1});
+                                layer.closeAll('page');
+                                table.reload('ruleTable');
+                            } else {
+                                layer.msg(res.msg, {icon: 2});
+                            }
+                        }, 'POST');
+                        return false;
+                    });
                 }
-            }, 'PUT');
-        });
+            });
+            form.render();
+            //执行一个laydate实例
+            //排班日期输入框
+            laydate.render({
+                elem: '#days', //指定元素
+                range:true
+            });
+
+
+        }
+
+
+        //获取所有启用班次
+        admin.req('shift/queryAll', {}, function (res) {
+            layer.closeAll('loading');
+            if (200 == res.code) {
+                mShifts = res.data;
+                for(var i=0;i<mShifts.length;i++) {
+                    console.log("考勤班次:"+mShifts[i].shiftName);
+                }
+            } else {
+                layer.msg('获取班次失败', {icon: 2});
+            }
+        }, 'GET');
+
+        //获取所有启用考勤地点
+        admin.req('place/queryAll', {}, function (res) {
+            layer.closeAll('loading');
+            if (200 == res.code) {
+                mPlaces = res.data;
+                for(var i=0;i<mPlaces.length;i++) {
+                    console.log("考勤地点:"+mPlaces[i].name);
+                }
+            } else {
+                layer.msg('获取考勤地点失败', {icon: 2});
+            }
+        }, 'GET');
+        //获取所有状态正常员工
+        admin.req('staff/queryAll', {}, function (res) {
+            layer.closeAll('loading');
+            if (200 == res.code) {
+                mStaffs = res.data;
+                for(var i=0;i<mStaffs.length;i++) {
+                    console.log("员工:"+mStaffs[i].staffName);
+                }
+            } else {
+                layer.msg('获取状态正常员工失败', {icon: 2});
+            }
+        }, 'GET');
+
+
+        //获取所有状态正常员工  去重的后的 新增时用
+        admin.req('staff/queryAllNotRepeat', {}, function (res) {
+            layer.closeAll('loading');
+            if (200 == res.code) {
+                mStaffsNotRepact = res.data;
+                for(var i=0;i<mStaffsNotRepact.length;i++) {
+                    console.log("去重后的员工:"+mStaffsNotRepact[i].staffName);
+                }
+            } else {
+                layer.msg('获取状态正常去重员工失败', {icon: 2});
+            }
+        }, 'GET');
+
+        //获取所有状态正常的部门
+        admin.req('dept/queryAllStatu', {}, function (res) {
+            layer.closeAll('loading');
+            if (200 == res.code) {
+                mDepts = res.data;
+                for(var i=0;i<mDepts.length;i++) {
+                    console.log("部门:"+mDepts[i].deptName);
+                }
+            } else {
+                layer.msg('获取状态正常部门失败', {icon: 2});
+            }
+        }, 'GET');
+
+
+        //获取所有状态正常的部门  去重后的部门 新增时调用
+        admin.req('dept/queryAllNotRepact', {}, function (res) {
+            layer.closeAll('loading');
+            if (200 == res.code) {
+                mDeptsNotRepact = res.data;
+                for(var i=0;i<mDeptsNotRepact.length;i++) {
+                    console.log("去重后的部门:"+mDeptsNotRepact[i].deptName);
+                }
+            } else {
+                layer.msg('获取状态正常去重部门失败', {icon: 2});
+            }
+        }, 'GET');
 
 
     });
+
 
 </script>
 </body>
