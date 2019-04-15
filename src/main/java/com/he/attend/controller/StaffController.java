@@ -116,7 +116,7 @@ public class StaffController {
         EntityWrapper entityWrapper=new EntityWrapper();
         entityWrapper.eq("state",0);
         List<Staff> staffList =staffService.selectList(entityWrapper);
-        return new PageResult<>(200,"查询员工成功",staffList.size(),staffList);
+        return new PageResult<>(0,"查询员工成功",staffList.size(),staffList);
     }
 
     /**

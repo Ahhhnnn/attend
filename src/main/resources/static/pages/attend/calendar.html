@@ -16,20 +16,27 @@
 
 
             </div>-->
-            <div id='calendar'style="float: right">
-                   <iframe id="calendarhtml" frameborder="0" width="1250px" height="600px" src="../../fullcalendar-3.6.2/demos/background-events.html"></iframe>
-               </div>
+
         </div>
 
 
+        <div style="float:left;">
+            <h2>展示人员列表</h2>
+            <table class="layui-table" id="staffTable" lay-filter="staffTable"></table>
+        </div>
+        <!--document.getElementById('iframeId').contentWindow.location.reload(true);-->
+        <div id='calendar'style="float:left">
+            <iframe id="calendarhtml" frameborder="0" width="1000px" height="600px" src="../../fullcalendar-3.6.2/demos/background-events.html"></iframe>
+        </div>
     </div>
+
     <!--<div id="showCalendar">
 
     </div>-->
    <!-- <table class="layui-table" id="calendarTable" lay-filter="calendarTable">-->
 
-    </table>
-<div></div>
+
+
 <div></div>
 
 <!-- js部分 -->
@@ -46,10 +53,34 @@
         var admin = layui.admin;
         var laydate=layui.laydate;
         var access_token = admin.getToken();
+        var staffId=1;
 
+        // 渲染表格
+        table.render({
+            elem: '#staffTable',
+            url: base_server + 'staff/queryAll',
+            method: 'post',
+            where: {
+                access_token: admin.getToken()
+            },
+            width:100,
+            cellMinWidth: 100,
+            cols: [[
+                {field: 'staffName', title: '姓名',width:90,event:'click'},
+                {field: 'staffId', title: 'id',hide:true}
+            ]],
+            skin: 'line'
+        });
 
-
-
+        table.on('tool(staffTable)',function (obj) {
+            var data=obj.data;
+            if(obj.event==='click'){
+                staffId=data.staffId;
+                console.log("点击人员的id为:"+staffId);
+            }
+            localStorage.setItem("staffId",staffId);
+            document.getElementById('calendarhtml').contentWindow.location.reload(true);
+        });
 // 渲染表格
         table.render({
             elem: '#calendarTable',

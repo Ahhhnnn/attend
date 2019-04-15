@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.he.attend.common.PageResult;
 import com.he.attend.common.utils.DateUtil;
+import com.he.attend.model.Attend;
 import com.he.attend.model.AttendCalendar;
+import com.he.attend.model.Event;
 import com.he.attend.model.Shift;
 import com.he.attend.service.CalendarService;
 import com.he.attend.service.ShiftService;
@@ -14,9 +16,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.thymeleaf.util.DateUtils;
 
 import javax.xml.crypto.Data;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -77,5 +81,28 @@ public class CalendarController {
         jsonObject.put("start","2017-10-03T13:00:00");
         jsonObject.put("constraint","businessHours");
         return jsonObject;
+    }
+    @RequestMapping("/querycalendar")
+    private PageResult<Event> queryCalendarByCondition(String startTime,String endTime,Integer staffId){
+        SimpleDateFormat sim=new SimpleDateFormat("yyyy-MM-dd",Locale.CHINA);
+        String start= DateUtil.getUnixToString(startTime,"yyyy-MM-dd");
+        String end=DateUtil.getUnixToString(endTime,"yyyy-MM-dd");
+        List<String> days=DateUtil.getDays(start,end);
+        EntityWrapper<AttendCalendar> wrapper=new EntityWrapper<AttendCalendar>();
+        wrapper.eq("staff_id",staffId);
+        wrapper.in("day",days);
+        List<AttendCalendar> calendars=calendarService.selectList(wrapper);
+        List<Event> events=new ArrayList<>();
+        for(AttendCalendar calendar:calendars){
+            Integer shiftId=calendar.getShiftId();
+            Shift shift=shiftService.getShiftById(shiftId);
+            Event event=new Event();
+            event.setTitle(shift.getShiftName());
+            event.setStart(calendar.getDay()+"T"+shift.getBeginTime());
+            event.setEnd(calendar.getDay()+"T"+shift.getEndTime());
+            event.setColor(shift.getColor());
+            events.add(event);
+        }
+        return new PageResult<>(200,"查询成功",events.size(),events);
     }
 }
