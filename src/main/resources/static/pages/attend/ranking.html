@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>排行榜展示</title>
+    <link rel="icon" href="../../assets/images/favicon.ico"/>
+    <link rel="stylesheet" href="../../assets/libs/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../assets/module/formSelects/formSelects-v4.css" media="all">
+    <link rel="stylesheet" href="../../assets/common.css" media="all">
+    <link rel="stylesheet" href="../../assets/libs/jquery/jquery-ui.css">
+    <script src="../../assets/libs/jquery/jquery-3.2.1.min.js"></script>
+    <script src="../../assets/libs/jquery/jquery-ui.js"></script>
+</head>
+<style>
+    #rankType>li{
+        float: left;
+    }
+</style>
+<body>
+<div>
+    <div class="layui-card">
+        <div>
+            <ul id="rankType">
+                <li>
+                    <div style="float:left;margin-left: 50px">
+                        <h1>总排行榜</h1><br>
+                        <ul id="view">
+                            <li>
+                            <div class="staff_info">
+                                <span>1</span>&nbsp;&nbsp;
+                                <span>何宁</span>&nbsp;&nbsp;
+                                <span>2018-04-21 08:30:29</span>
+                            </div><br>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li>
+                    <div style="margin-left: 70px">
+
+                        <h1>管理部排行榜</h1><br>
+                        <ul id="10001view">
+
+                        </ul>
+                    </div>
+                </li>
+                <li>
+                    <div style="margin-left: 70px">
+                        <h1>研发部排行榜</h1><br>
+                        <ul id="10003view">
+
+                        </ul>
+                    </div>
+                </li>
+                <li>
+                    <div style="margin-left: 70px">
+                        <h1>财务部排行榜</h1><br>
+                        <ul id="10002view">
+
+                        </ul>
+                    </div>
+                </li>
+                <li>
+                    <div style="margin-left: 70px">
+                        <h1>运营部排行榜</h1><br>
+                        <ul id="10004view">
+
+                        </ul>
+                    </div>
+                </li>
+                <!--<li>
+                    <div style="margin-left: 70px">
+                        <h1>实施部排行榜</h1><br>
+                        <ul id="10005view">
+
+                        </ul>
+                    </div>
+                </li>-->
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<div class="layui-inline"> <!-- 注意：这一层元素并不是必须的 -->
+
+</div>
+<script id="staffAttendInfo" type="text/html">
+    {{#  layui.each(d.data, function(index, item){ }}
+    <li>
+        <div class="staff_info" style="font-size: 14px">
+            <span>{{index+1}}</span>&nbsp;&nbsp;
+            <span>{{item.staffName}}</span>&nbsp;&nbsp;
+            <span>{{item.attendTime}}</span>
+        </div><br>
+    </li>
+    {{#  }); }}
+</script>
+<script id="10003AttendInfo" type="text/html">
+    {{#  layui.each(d.data, function(index, item){ }}
+    <li>
+        <div class="staff_info" style="font-size: 14px">
+            <span>{{index+1}}</span>&nbsp;&nbsp;
+            <span>{{item.staffName}}</span>&nbsp;&nbsp;
+            <span>{{item.attendTime}}</span>
+        </div><br>
+    </li>
+    {{#  }); }}
+</script>
+<script id="10001AttendInfo" type="text/html">
+    {{#  layui.each(d.data, function(index, item){ }}
+    <li>
+        <div class="staff_info" style="font-size: 14px">
+            <span>{{index+1}}</span>&nbsp;&nbsp;
+            <span>{{item.staffName}}</span>&nbsp;&nbsp;
+            <span>{{item.attendTime}}</span>
+        </div><br>
+    </li>
+    {{#  }); }}
+</script>
+<script id="10002AttendInfo" type="text/html">
+    {{#  layui.each(d.data, function(index, item){ }}
+    <li>
+        <div class="staff_info" style="font-size: 14px">
+            <span>{{index+1}}</span>&nbsp;&nbsp;
+            <span>{{item.staffName}}</span>&nbsp;&nbsp;
+            <span>{{item.attendTime}}</span>
+        </div><br>
+    </li>
+    {{#  }); }}
+</script>
+<script id="10004AttendInfo" type="text/html">
+    {{#  layui.each(d.data, function(index, item){ }}
+    <li>
+        <div class="staff_info" style="font-size: 14px">
+            <span>{{index+1}}</span>&nbsp;&nbsp;
+            <span>{{item.staffName}}</span>&nbsp;&nbsp;
+            <span>{{item.attendTime}}</span>
+        </div><br>
+    </li>
+    {{#  }); }}
+</script>
+
+<script id="10005AttendInfo" type="text/html">
+    {{#  layui.each(d.data, function(index, item){ }}
+    <li>
+        <div class="staff_info" style="font-size: 14px">
+            <span>{{index+1}}</span>&nbsp;&nbsp;
+            <span>{{item.staffName}}</span>&nbsp;&nbsp;
+            <span>{{item.attendTime}}</span>
+        </div><br>
+    </li>
+    {{#  }); }}
+</script>
+<script src="../../assets/libs/layui/layui.js"></script>
+<script src="../../assets/common.js"></script>
+<script>
+    layui.use(['layer', 'form', 'table', 'util','admin','laydate','laytpl'], function (){
+        var laydate = layui.laydate;
+        var laytpl=layui.laytpl;
+        var $ = layui.jquery;
+
+        var admin=layui.admin;
+        //获取所有打卡信息
+        admin.req('attend/queryToday', {}, function (res) {
+            layer.closeAll('loading');
+            if (200 == res.code) {
+                var demo=document.getElementById('staffAttendInfo');
+                var getTpl = demo.innerHTML
+                    ,view = document.getElementById('view');
+                laytpl(getTpl).render(res, function(html){
+                    view.innerHTML = html;
+                });
+            } else {
+                layer.msg('获取今天打卡信息失败失败', {icon: 2});
+            }
+        }, 'GET');
+
+        //获取研发部打卡信息
+        admin.req('attend/queryToday', {deptId:10003}, function (res) {
+            layer.closeAll('loading');
+            if (200 == res.code) {
+                var demo=document.getElementById('10003AttendInfo');
+                var getTpl = demo.innerHTML
+                    ,view = document.getElementById('10003view');
+                laytpl(getTpl).render(res, function(html){
+                    view.innerHTML = html;
+                });
+            } else {
+                layer.msg('获取今天打卡信息失败失败', {icon: 2});
+            }
+        }, 'GET');
+
+        //获取管理部打卡信息
+        admin.req('attend/queryToday', {deptId:10001}, function (res) {
+            layer.closeAll('loading');
+            if (200 == res.code) {
+                var demo=document.getElementById('10001AttendInfo');
+                var getTpl = demo.innerHTML
+                    ,view = document.getElementById('10001view');
+                laytpl(getTpl).render(res, function(html){
+                    view.innerHTML = html;
+                });
+            } else {
+                layer.msg('获取今天打卡信息失败失败', {icon: 2});
+            }
+        }, 'GET');
+
+
+        //获取财务部打卡信息
+        admin.req('attend/queryToday', {deptId:10002}, function (res) {
+            layer.closeAll('loading');
+            if (200 == res.code) {
+                var demo=document.getElementById('10002AttendInfo');
+                var getTpl = demo.innerHTML
+                    ,view = document.getElementById('10002view');
+                laytpl(getTpl).render(res, function(html){
+                    view.innerHTML = html;
+                });
+            } else {
+                layer.msg('获取今天打卡信息失败失败', {icon: 2});
+            }
+        }, 'GET');
+
+        //获取运营部打卡信息
+        admin.req('attend/queryToday', {deptId:10004}, function (res) {
+            layer.closeAll('loading');
+            if (200 == res.code) {
+                var demo=document.getElementById('10004AttendInfo');
+                var getTpl = demo.innerHTML
+                    ,view = document.getElementById('10004view');
+                laytpl(getTpl).render(res, function(html){
+                    view.innerHTML = html;
+                });
+            } else {
+                layer.msg('获取今天打卡信息失败失败', {icon: 2});
+            }
+        }, 'GET');
+
+        //获取运营部打卡信息
+        admin.req('attend/queryToday', {deptId:10005}, function (res) {
+            layer.closeAll('loading');
+            if (200 == res.code) {
+                var demo=document.getElementById('10005AttendInfo');
+                var getTpl = demo.innerHTML
+                    ,view = document.getElementById('10005view');
+                laytpl(getTpl).render(res, function(html){
+                    view.innerHTML = html;
+                });
+            } else {
+                layer.msg('获取今天打卡信息失败失败', {icon: 2});
+            }
+        }, 'GET');
+
+    });
+
+
+</script>
+</body>
+</html>

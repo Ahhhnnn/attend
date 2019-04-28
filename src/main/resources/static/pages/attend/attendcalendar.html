@@ -107,13 +107,13 @@
                 </div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label">考勤地点</label>
-                <div class="layui-input-block">
-                    <select id="placeSel" name="placeId" xm-select="selPlace" xm-select-skin="default" lay-verify="required">
-                        <option value="">请选择考勤地点</option>
-                    </select>
-                </div>
+            <label class="layui-form-label">考勤地点</label>
+            <div class="layui-input-block">
+                <select id="placeSel" name="placeId" xm-select="selPlace" xm-select-skin="default" lay-verify="required">
+                    <option value="">请选择考勤地点</option>
+                </select>
             </div>
+        </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">适用部门</label>
                 <div class="layui-input-block">
@@ -235,21 +235,6 @@
                 success: function (layero, index) {
                     $(layero).children('.layui-layer-content').css('overflow', 'visible');
                     form.render();
-                    // 渲染角色下拉框
-                    /*var roleSelData = new Array();
-                    for (var i = 0; i < mRoles.length; i++) {
-                        roleSelData.push({name: mRoles[i].roleName, value: mRoles[i].roleId});
-                    }
-                    formSelects.data('selRole', 'local', {arr: roleSelData});*/
-                    // 回显shift数据
-                    /* if (data) {
-                         //form.val('shiftForm', data);
-                         /!*var rds = new Array();
-                         for (var i = 0; i < data.roles.length; i++) {
-                             rds.push(data.roles[i].roleId);
-                         }
-                         formSelects.value('selRole', rds);  // 回显多选框*!/
-                     }*/
                     //回显shift
                     var shiftSelData=new Array();
                     for (var i=0;i<mShifts.length;i++){
@@ -434,7 +419,7 @@
                 success: function (layero, index) {
                     $(layero).children('.layui-layer-content').css('overflow', 'visible');
                     form.render();
-                    //回显shift
+                    //渲染
                     var shiftSelData=new Array();
                     for (var i=0;i<mShifts.length;i++){
                         shiftSelData.push({name:mShifts[i].shiftName,value:mShifts[i].shiftId});
@@ -442,7 +427,7 @@
                     for(var i=0;i<shiftSelData.length;i++){
                         $('#selShift').append("<option value='"+shiftSelData[i].value+"'>"+shiftSelData[i].name+"</option>");
                     }
-                    //回显place
+                    //渲染
                     var placeSelData=new Array();
                     for (var i=0;i<mPlaces.length;i++){
                         placeSelData.push({name:mPlaces[i].name,value:mPlaces[i].id});
@@ -451,14 +436,14 @@
                         $('#placeSel').append("<option value='"+placeSelData[i].value+"'>"+placeSelData[i].name+"</option>");
                     }
                     console.log(document.getElementById('placeSel'))
-                    //回显staff
+                    //渲染
                     var staffSelData=new Array();
                     for (var i=0;i<mStaffs.length;i++){
                         staffSelData.push({name:mStaffs[i].staffName,value:mStaffs[i].staffId});
                     }
                     formSelects.data('selStaff','local',{arr:staffSelData});
 
-                    //回显depts
+                    //渲染
                     var deptSelData=new Array();
                     for (var i=0;i<mDepts.length;i++){
                         deptSelData.push({name:mDepts[i].deptName,value:mDepts[i].deptId});
@@ -466,7 +451,6 @@
                     formSelects.data('selDept','local',{arr:deptSelData});
                     // 回显rule数据
                     if (data) {
-                        console.log(data);
                         form.val('ruleForm', data);
                         var staffs = new Array();
                         var depts=new Array();

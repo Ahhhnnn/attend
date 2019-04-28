@@ -4,11 +4,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.he.attend.common.PageResult;
 import com.he.attend.common.utils.DateUtil;
-import com.he.attend.model.Attend;
-import com.he.attend.model.AttendCalendar;
-import com.he.attend.model.Event;
-import com.he.attend.model.Shift;
+import com.he.attend.model.*;
 import com.he.attend.service.CalendarService;
+import com.he.attend.service.PlaceService;
 import com.he.attend.service.ShiftService;
 import com.sun.org.apache.xalan.internal.xsltc.dom.SAXImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +31,9 @@ public class CalendarController {
 
     @Autowired
     private ShiftService shiftService;
+
+    @Autowired
+    private PlaceService placeService;
 
     @RequestMapping("/query")
     public PageResult queryCalendar(Integer staffId, String date){
@@ -104,5 +105,13 @@ public class CalendarController {
             events.add(event);
         }
         return new PageResult<>(200,"查询成功",events.size(),events);
+    }
+
+    @RequestMapping("queryPlace")
+    public PageResult<Place> queryPlace(Integer placeId){
+        List<Place> placeList=new ArrayList<>();
+        Place place=placeService.queryById(placeId);
+        placeList.add(place);
+        return new PageResult<>(200,"查询考勤地点成功",placeList.size(),placeList);
     }
 }

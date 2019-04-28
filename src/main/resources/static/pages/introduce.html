@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>系统介绍页面</title>
+    <link rel="stylesheet" href="../assets/libs/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../assets/common.css" media="all">
+</head>
+<body>
+<div class="layui-carousel" id="test1">
+    <div carousel-item>
+        <div style="text-align: center;background-color: #3a87ad">系统介绍</div>
+        <div style="background-color: #009f95">条目2</div>
+        <div style="text-align: center;background-color: #3a87ad">条目3</div>
+        <div style="background-color: #009f95">条目4</div>
+        <div  style="text-align: center;background-color: #3a87ad">条目5</div>
+    </div>
+</div>
+</body>
+<script src="../assets/libs/layui/layui.js"></script>
+<script src="../assets/common.js"></script>
+<script>
+    layui.use('carousel', function(){
+        var carousel = layui.carousel;
+        //建造实例
+        carousel.render({
+            elem: '#test1'
+            ,width: '100%' //设置容器宽度
+            ,height:400
+            ,arrow: 'always' //始终显示箭头
+            //,anim: 'updown' //切换动画方式
+        });
+    });
+</script>
+</html>

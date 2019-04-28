@@ -12,7 +12,7 @@ public class AttendCalendar {
     @TableId
     private Integer id;//主键id
 
-    //private Integer placeId;//考勤地点id，外键
+    private Integer placeId;//考勤地点id，外键
 
     private String placeName;//考勤地点名称
 

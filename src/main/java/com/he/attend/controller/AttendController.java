@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.he.attend.common.PageResult;
 import com.he.attend.model.Attend;
+import com.he.attend.model.DayReport;
 import com.he.attend.model.Staff;
 import com.he.attend.service.AttendService;
 import io.swagger.annotations.ApiImplicitParam;
@@ -15,7 +16,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import sun.nio.ch.SelectorImpl;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 @Slf4j
 @RestController
@@ -71,9 +77,39 @@ public class AttendController {
             }
         }
         wrapper.eq("dr",0);
-        wrapper.orderBy("createTime", true);
+        wrapper.orderBy("createTime", false);
         attendService.selectPage(attendPage, wrapper);
         List<Attend> attendsList = attendPage.getRecords();
         return new PageResult<>(attendsList, attendPage.getTotal());
     }
+
+    @RequestMapping("queryToday")
+    public PageResult<Attend> queryToday(Integer deptId){
+
+        Date date=new Date();
+        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd");
+        String today=simpleDateFormat.format(date);
+        EntityWrapper<Attend> attendEntityWrapper=new EntityWrapper<Attend>();
+        attendEntityWrapper.like("attend_time",today);
+        if(deptId!=null){
+            attendEntityWrapper.eq("dept_id",deptId);
+        }
+        List<Attend> attendList=attendService.selectList(attendEntityWrapper);
+        List<Attend> finalAttendList=new ArrayList<>();
+        finalAttendList.addAll(attendList);
+        SimpleDateFormat simfor=new SimpleDateFormat("HH:mm:ss");
+        /*for(Attend attend:attendList){
+            String time=attend.getAttendTime().split(" ")[1];
+            try {
+                if(simfor.parse(time).after(simfor.parse("12:00:00"))){
+                    finalAttendList.remove(attend);
+                }
+            }catch (ParseException e){
+                log.error(e.getMessage(),e);
+            }
+        }*/
+        return new PageResult<Attend>(200,"查询成功",finalAttendList.size(),finalAttendList);
+    }
+
+
 }

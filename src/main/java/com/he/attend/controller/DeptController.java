@@ -235,8 +235,10 @@ public class DeptController {
         List<String> deptIdsString=ruleList.stream().map(Rule->Rule.getDeptIds()).collect(Collectors.toList());
         List<Integer> deptIds=new ArrayList<>();
         for(String deptId:deptIdsString){
-            for(String deptid:deptId.split(",")){
-                deptIds.add(Integer.valueOf(deptid));
+            if(!deptId.equals("")) {
+                for (String deptid : deptId.split(",")) {
+                    deptIds.add(Integer.valueOf(deptid));
+                }
             }
         }
         List<Dept> finalDepts=new ArrayList<>();

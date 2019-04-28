@@ -70,8 +70,25 @@ public class RuleController {
         String endDay=attendDays.split(" - ")[1];
         List<String> days=DataUtils.getDays(startDay,endDay);//需要排班的日期的集合
         //通过传入的部门id 和 人员id 去重，决定要给那些人员排班
-        List<Integer> staffIds=getFinalStaffIds(rule.getDeptIds(),rule.getStaffIds());
-        if(!calendarService.insert(staffIds,days,rule.getPlaceName(),rule.getShiftId())){
+        List<Integer> staffIds=new ArrayList<>();
+        if(rule.getDeptIds().equals("")&&rule.getStaffIds().equals("")){
+            return new PageResult("请选择排班部门或人员",400);
+        }else if(rule.getDeptIds().equals("")&&!rule.getStaffIds().equals("")){
+            for(String staffid:rule.getStaffIds().split(",")){
+                staffIds.add(Integer.valueOf(staffid));
+            }
+        }else if(!rule.getStaffIds().equals("")&&!rule.getDeptIds().equals("")) { //如果部门id 和人员都不为空 ，去重
+
+            staffIds = getFinalStaffIds(rule.getDeptIds(), rule.getStaffIds());
+        }else if(!rule.getDeptIds().equals("")&&rule.getStaffIds().equals("")){//如果部门id不为空，人员id为空
+            for (String deptId:rule.getDeptIds().split(",")){
+                List<Staff> staffList=staffService.queryByDeptId(Integer.valueOf(deptId));
+                for(Staff staff:staffList){
+                    staffIds.add(staff.getStaffId());
+                }
+            }
+        }
+        if(!calendarService.insert(staffIds,days,rule.getPlaceId(),rule.getPlaceName(),rule.getShiftId())){
             return new PageResult("排班失败",400);
         }
         ruleService.insert(rule);
@@ -163,7 +180,7 @@ public class RuleController {
         //重新排班，将修改后的开始至结束时间 所有人人员的排班删除后在重新插入
         List<Integer> staffIds=getFinalStaffIds(rule.getDeptIds(),rule.getStaffIds());
         if(calendarService.delete(staffIds,days)){//如果删除成功 就重新插入排班
-            if(!calendarService.insert(staffIds,days,rule.getPlaceName(),rule.getShiftId())){
+            if(!calendarService.insert(staffIds,days,rule.getPlaceId(),rule.getPlaceName(),rule.getShiftId())){
                 return new PageResult("排班失败",400);
             }
         }else {//如果删除失败 返回排班失败

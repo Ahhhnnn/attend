@@ -250,7 +250,6 @@
                 content: $('#staffs').html(),
                 success:function (layero, index) {
                     $(layero).children('.layui-layer-content').css('overflow', 'visible');
-                    form.render('radio');
                     //渲染表格
                     table.render({
                         elem: '#staffTable',

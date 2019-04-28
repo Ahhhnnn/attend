@@ -91,9 +91,10 @@ public class LoginController {
         //设置打卡类型 根据打卡时间判断打卡类型  2019-03-30 17:32:18
         //判断是早上还是下午打卡
         String time=attendTime.split(" ")[1];
+        String attendDay=attendTime.split(" ")[0];
+        isDeleteCalendar(staffId,attendDay);
         SimpleDateFormat simfor=new SimpleDateFormat("HH:mm:ss");
         try {
-
             if((simfor.parse(time).before(simfor.parse("12:00:00")))&&(simfor.parse(time).before(simfor.parse(shift.getBeginTime())))){
                 //在12点前及打卡开始时间之前打卡 是正常打卡
                 attend.setType("正常");
@@ -102,12 +103,12 @@ public class LoginController {
                 //在12点前及打卡开始时间之后打 迟到打卡
                 attend.setType("迟到");
             }
-            if ((simfor.parse(time).after(simfor.parse("12:00:00")))&&(simfor.parse(time).before(simfor.parse(shift.getBeginTime())))){
+            if ((simfor.parse(time).after(simfor.parse("12:00:00")))&&(simfor.parse(time).before(simfor.parse(shift.getEndTime())))){
                 //在12点之后及打卡结束时间之前打 早退打卡
                 attend.setType("早退");
             }
-            if ((simfor.parse(time).after(simfor.parse("12:00:00")))&&(simfor.parse(time).after(simfor.parse(shift.getBeginTime())))){
-                //在12点之后及打卡结束时间之前打 正常打卡
+            if ((simfor.parse(time).after(simfor.parse("12:00:00")))&&(simfor.parse(time).after(simfor.parse(shift.getEndTime())))){
+                //在12点之后及打卡结束时间之后打 正常打卡
                 attend.setType("正常");
             }
         }catch (ParseException e) {
@@ -115,7 +116,21 @@ public class LoginController {
         }
         attend.setPlace(place);
         attend.setAttendTime(attendTime);
+
         attendService.insert(attend);
         return new  PageResult("打卡成功",200);
+    }
+
+    private void isDeleteCalendar(Integer staffId,String attendDay){
+        List<Attend> attendList=attendService.queryByStaffIdAndAttendDay(staffId,attendDay);
+        //list中可能有三种情况， 无记录 （第一次打卡） 有一次记录（第二次打卡） 有两条记录（多次打卡）
+        if(CollectionUtils.isEmpty(attendList)){
+
+        }else if(attendList.size()==1){
+
+        }else if(attendList.size()==2){
+            Attend attend=attendList.get(0);//第一个为最后插入的打卡记录
+            attendService.deleteById(attend.getAttendId());
+        }
     }
 }

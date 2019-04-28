@@ -12,7 +12,7 @@ layui.config({
 
 
 });
-
+console.log("项目的绝对路径为:"+getProjectUrl());
 // 获取当前项目的绝对路径
 function getProjectUrl() {
     var layuiDir = layui.cache.dir;
