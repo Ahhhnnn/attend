@@ -320,4 +320,102 @@ public class DateUtil {
 		}
 		return days;
 	}
+
+	public static String getLastDayOfMonth(int year,int month) {
+
+		Calendar cal = Calendar.getInstance();
+
+		//设置年份
+
+		cal.set(Calendar.YEAR,year);
+
+		//设置月份
+
+		cal.set(Calendar.MONTH, month-1);
+
+		//获取某月最大天数
+
+		int lastDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+
+		//设置日历中月份的最大天数
+
+		cal.set(Calendar.DAY_OF_MONTH, lastDay);
+
+		//格式化日期
+
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+		String lastDayOfMonth = sdf.format(cal.getTime());
+
+		return lastDayOfMonth;
+
+	}
+
+    public static String getFitstDayOfMonth(int year,int month) {
+
+        Calendar cal = Calendar.getInstance();
+
+        //设置年份
+
+        cal.set(Calendar.YEAR,year);
+
+        //设置月份
+
+        cal.set(Calendar.MONTH, month-1);
+
+        //获取某月最小天数
+
+        //int lastDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+
+        int fitstDay=cal.getActualMinimum(Calendar.DAY_OF_MONTH);
+        //设置日历中月份的最大天数
+
+        cal.set(Calendar.DAY_OF_MONTH, fitstDay);
+
+        //格式化日期
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+        String lastDayOfMonth = sdf.format(cal.getTime());
+
+        return lastDayOfMonth;
+
+    }
+
+    public static Long dateDiff(String startTime, String endTime,
+								String format, String str) {
+		// 按照传入的格式生成一个simpledateformate对象
+		SimpleDateFormat sd = new SimpleDateFormat(format);
+		long nd = 1000 * 24 * 60 * 60;// 一天的毫秒数
+		long nh = 1000 * 60 * 60;// 一小时的毫秒数
+		long nm = 1000 * 60;// 一分钟的毫秒数
+		long ns = 1000;// 一秒钟的毫秒数
+		long diff;
+		long day = 0;
+		long hour = 0;
+		long min = 0;
+		long sec = 0;
+		// 获得两个时间的毫秒时间差异
+		try {
+			diff = sd.parse(endTime).getTime() - sd.parse(startTime).getTime();
+			day = diff / nd;// 计算差多少天
+			hour = diff % nd / nh + day * 24;// 计算差多少小时
+			min = diff % nd % nh / nm + day * 24 * 60;// 计算差多少分钟
+			sec = diff % nd % nh % nm / ns;// 计算差多少秒
+			if (str.equalsIgnoreCase("h")) {
+				return hour;
+			} else {
+				return min;
+			}
+
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if (str.equalsIgnoreCase("h")) {
+			return hour;
+		} else {
+			return min;
+		}
+	}
 }

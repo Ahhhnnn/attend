@@ -78,11 +78,12 @@ public class LoginController {
      * @return
      */
     @RequestMapping("/attend")
-    public PageResult attend(Integer staffId,String attendTime,String place,Integer shiftId){
+    public PageResult attend(Integer staffId,String attendTime,String place,Integer shiftId,String placeType){
         Staff staff=staffService.queryByStaffId(staffId);
         Shift shift=shiftService.getShiftById(shiftId);
         Attend attend=new Attend();
         attend.setStaffId(staffId);
+        attend.setPlaceType(placeType);
         attend.setStaffName(staff.getStaffName());
         attend.setShiftId(shiftId);
         attend.setShiftName(shift.getShiftName());

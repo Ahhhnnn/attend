@@ -60,7 +60,7 @@ public class DeptController {
             @ApiImplicitParam(name = "access_token", value = "令牌", required = true, dataType = "String", paramType = "form")
     })
     @PutMapping("/statu")
-    public JsonResult updateState(Integer deptId, Integer statu) {
+        public JsonResult updateState(Integer deptId, Integer statu) {
         if (statu == null || (statu != 0 && statu != 1)) {
             return JsonResult.error("state值需要在[0,1]中");
         }

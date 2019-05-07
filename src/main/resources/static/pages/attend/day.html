@@ -32,6 +32,7 @@
             </div>
             <div class="layui-inline">
                 <button id="dayBtnSearch" class="layui-btn icon-btn"><i class="layui-icon">&#xe615;</i>搜索</button>
+                <button id="dayReConculate" class="layui-btn icon-btn"><i class="layui-icon">&#xe615;</i>重新计算</button>
             </div>
 
             <table class="layui-table" id="dayTable" lay-filter="dayTable"></table>
@@ -77,12 +78,7 @@
                 {field: 'firAttendTime', title: '打卡时间1'},
                 {field: 'secAttendTime', title: '打卡时间2'},
                 {field: 'workHour', title: '出勤工时'},
-                {field: 'notWorkHour', title: '缺勤工时'},
-                {
-                    templet: function (d) {
-                        return util.toDateString(d.createTime);
-                    }, title: '创建时间'
-                }
+                {field: 'notWorkHour', title: '缺勤工时'}
             ]],
             skin: 'line',
             size: 'lg'
@@ -92,8 +88,8 @@
         $('#dayBtnSearch').click(function () {
             var key = $('#sltKey').val();
             var value = $('#edtSearch').val();
-            var month=$('#month').val();
-            table.reload('dayTable', {where: {searchKey: key, searchValue: value,month:month}});
+            var day=$('#day').val();
+            table.reload('dayTable', {where: {searchKey: key, searchValue: value, day:day}});
         });
 
 
@@ -104,6 +100,21 @@
 
         });
 
+        $('#dayReConculate').click(function () {
+            layer.load(0);
+            var day=$('#day').val();
+            admin.req('day/insert', {day:day}, function (res) {
+                if (200 == res.code) {
+                    layer.closeAll('loading');
+                    layer.msg(res.msg, {icon: 1, time: 1000}, function () {
+                        location.reload();
+                    });
+
+                } else {
+                    layer.msg(data.msg, {icon: 2});
+                }
+            }, 'POST');
+        });
 
     });
 </script>

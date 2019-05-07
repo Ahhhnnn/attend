@@ -19,6 +19,7 @@ public class Attend {
     private Integer deptId;//部门id
     private String deptName;//部门名称
     private String type; //考勤类型 1 正常  2 迟到 3 早退 4 请假
+    private String placeType;//外勤还是内勤
     private String place;//打卡地点
     private String attendTime;//打卡时间
     private Date createTime;//创建时间

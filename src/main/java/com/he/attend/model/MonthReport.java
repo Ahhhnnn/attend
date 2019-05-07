@@ -26,6 +26,12 @@ public class MonthReport {
 
     private String staffName;
 
+    private Integer deptId;
+
+    private String deptName;
+
+    private String shoudWorkHour;//应出勤工时
+
     private String workHour;
 
     private String notWorkHour;
@@ -33,6 +39,8 @@ public class MonthReport {
     private Integer lateNum; //迟到次数
 
     private Integer leaveEarlyNum;//早退次数
+
+    private Integer notWorkDay; //旷工天数
 
     private Date createTime;  // 创建时间
 

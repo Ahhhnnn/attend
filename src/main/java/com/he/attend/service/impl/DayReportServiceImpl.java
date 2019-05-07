@@ -26,4 +26,10 @@ public class DayReportServiceImpl extends ServiceImpl<DayReportMapper, DayReport
     @Autowired
     private AttendService attendService;
 
+    @Override
+    public List<DayReport> queryByDay(String day) {
+        EntityWrapper<DayReport> dayReportEntityWrapper=new EntityWrapper<DayReport>();
+        dayReportEntityWrapper.eq("day",day);
+        return baseMapper.selectList(dayReportEntityWrapper);
+    }
 }

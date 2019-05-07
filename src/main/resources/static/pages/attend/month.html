@@ -32,6 +32,7 @@
             </div>
             <div class="layui-inline">
                 <button id="monthBtnSearch" class="layui-btn icon-btn"><i class="layui-icon">&#xe615;</i>搜索</button>
+                <button id="monthReConculate" class="layui-btn icon-btn"><i class="layui-icon">&#xe615;</i>重新计算</button>
             </div>
 
             <table class="layui-table" id="monthTable" lay-filter="monthTable"></table>
@@ -74,15 +75,14 @@
             cols: [[
                 {type: 'numbers'},
                 {field: 'staffName', title: '员工姓名'},
+                {field: 'deptName', title: '部门名称'},
+                {field: 'month', title: '考勤月份'},
+                {field: 'shoudWorkHour', title: '应出勤工时'},
                 {field: 'workHour', title: '月出勤工时'},
                 {field: 'notWorkHour', title: '月缺勤工时'},
                 {field: 'lateNum', title: '迟到次数'},
                 {field: 'leaveEarlyNum', title: '早退次数'},
-                {
-                    templet: function (d) {
-                        return util.toDateString(d.createTime);
-                    }, title: '创建时间'
-                }
+                {field: 'notWorkDay', title: '旷工天数'}
             ]],
             skin: 'line',
             size: 'lg'
@@ -96,6 +96,24 @@
             table.reload('monthTable', {where: {searchKey: key, searchValue: value,month:month}});
         });
 
+
+
+         $('#monthReConculate').click(function () {
+             layer.load(0);
+             var month=$('#month').val();
+
+             admin.req('month/insert', {month:month}, function (res) {
+                 if (200 == res.code) {
+                     layer.closeAll('loading');
+                     layer.msg(res.msg, {icon: 1, time: 1000}, function () {
+                         location.reload();
+                     });
+
+                 } else {
+                     layer.msg(data.msg, {icon: 2});
+                 }
+             }, 'POST');
+         });
 
     });
 </script>

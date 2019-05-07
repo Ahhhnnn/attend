@@ -78,7 +78,7 @@ public class RoleController {
             @ApiImplicitParam(name = "access_token", value = "令牌", required = true, dataType = "String", paramType = "query")
     })
     @DeleteMapping("/{id}")
-    public JsonResult delete(@PathVariable("id") String roleId) {
+    public JsonResult delete(@PathVariable("id") Integer roleId) {
         if (roleService.deleteById(roleId)) {
             return JsonResult.ok("删除成功");
         }

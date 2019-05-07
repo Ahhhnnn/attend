@@ -127,7 +127,12 @@
                 {type: 'numbers'},
                 {field: 'shiftId', title: '班次编号',hide:true},
                 {field: 'shiftName', title: '班次名称'},
-                {field: 'color', title: '班次颜色'},
+                {
+                    templet: function (d) {
+                        var str = '<span  style="background-color: '+d.color+'" class="">'+d.color+'</span>';
+                        return str;
+                    }, title: '班次颜色'
+                },
                 {field: 'beginTime', title: '开始时间'},
                 {field: 'endTime', title: '结束时间'},
                 {field:'createTime',title:'创建时间'},

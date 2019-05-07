@@ -1,12 +1,16 @@
 package com.he.attend.controller;
+/**
+ * 考勤记录Controller
+ */
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.he.attend.common.PageResult;
-import com.he.attend.model.Attend;
-import com.he.attend.model.DayReport;
-import com.he.attend.model.Staff;
+import com.he.attend.model.*;
 import com.he.attend.service.AttendService;
+import com.he.attend.service.DeptService;
+import com.he.attend.service.ShiftService;
+import com.he.attend.service.StaffService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -30,6 +34,29 @@ public class AttendController {
     @Autowired
     private AttendService attendService;
 
+    @Autowired
+    private StaffService staffService;
+    @Autowired
+    private DeptService deptService;
+    @Autowired
+    private ShiftService shiftService;
+    @RequestMapping("insert")
+    public PageResult insert(Attend attend){
+
+        String staffName=attend.getStaffName();
+        Staff staff=staffService.getByStaffName(staffName);
+        Dept dept=deptService.queryByDeptId(staff.getDeptId());
+        Shift shift=shiftService.getShiftById(attend.getShiftId());
+        attend.setStaffId(staff.getStaffId());
+        attend.setDeptId(dept.getDeptId());
+        attend.setDeptName(dept.getDeptName());
+        attend.setShiftName(shift.getShiftName());
+        if(attendService.insert(attend)){
+            return new PageResult("补考勤成功",200);
+        }
+        return new PageResult("补考勤失败",400);
+
+    }
 
     @RequestMapping(value = "/update" ,method = RequestMethod.POST)
     public PageResult updateAttend(Attend attend){

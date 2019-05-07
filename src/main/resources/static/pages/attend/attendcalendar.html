@@ -397,6 +397,7 @@
                         if (data.code == 200) {
                             layer.msg(data.msg, {icon: 1});
                             obj.del();
+                            location.reload();
                         } else {
                             layer.msg(data.msg, {icon: 2});
                         }

@@ -31,7 +31,7 @@
             </div>
             <div class="layui-inline">
                 <button id="attendBtnSearch" class="layui-btn icon-btn"><i class="layui-icon">&#xe615;</i>搜索</button>
-                <!--<button id="userBtnAdd" class="layui-btn icon-btn"><i class="layui-icon">&#xe654;</i>添加</button>-->
+                <button id="attendBtnAdd" class="layui-btn icon-btn"><i class="layui-icon">&#xe654;</i>补考勤</button>
             </div>
 
             <table class="layui-table" id="attendTable" lay-filter="attendTable"></table>
@@ -57,28 +57,21 @@
         <div class="layui-form-item">
             <label class="layui-form-label">员工姓名</label>
             <div class="layui-input-block">
-                <input name="staffName" placeholder="请输入员工姓名" type="text" class="layui-input"
+                <input name="staffName" placeholder="请输入员工姓名" type="text" class="layui-input" readonly
                        maxlength="20" lay-verify="required" required/>
             </div>
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label">班次名称</label>
             <div class="layui-input-block">
-                <input name="shiftName" placeholder="请输入班次名称" type="text" class="layui-input"
+                <input name="shiftName" placeholder="请输入班次名称" type="text" class="layui-input" readonly
                        maxlength="20" lay-verify="required" required/>
             </div>
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label">部门名称</label>
             <div class="layui-input-block">
-                <input name="deptName" placeholder="请输入部门名称" type="text" class="layui-input"
-                       lay-verify="required" required/>
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">打卡地点</label>
-            <div class="layui-input-block">
-                <input name="place" placeholder="请输入打卡地点" type="text" class="layui-input"
+                <input name="deptName" placeholder="请输入部门名称" type="text" class="layui-input" readonly
                        lay-verify="required" required/>
             </div>
         </div>
@@ -105,7 +98,13 @@
                 <input type="radio" name="type" value="请假" title="请假"/>
             </div>
         </div>
-
+        <div class="layui-form-item">
+            <label class="layui-form-label">内外勤</label>
+            <div class="layui-input-block">
+                <input type="radio" name="placeType" value="内勤" title="内勤" checked/>
+                <input type="radio" name="placeType" value="外勤" title="外勤"/>
+            </div>
+        </div>
         <div class="layui-form-item text-right">
             <button class="layui-btn layui-btn-primary" type="button" ew-event="closeDialog">取消</button>
             <button class="layui-btn" lay-filter="attendFormSubmit" lay-submit>保存</button>
@@ -113,6 +112,62 @@
     </form>
 </script>
 
+<!-- 补考勤表单弹窗 -->
+<script type="text/html" id="attendAddForm">
+    <form lay-filter="attendAddForm" class="layui-form model-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">员工姓名</label>
+            <div class="layui-input-block">
+                <input name="staffName" placeholder="请输入员工姓名" type="text" class="layui-input"
+                       maxlength="20" lay-verify="required" required/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">班次名称</label>
+            <div class="layui-input-block">
+                <select id="selShift" name="shiftId" xm-select="selShift" xm-select-skin="default" lay-verify="required">
+                    <option value="">请选择考勤班次</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">打卡地点</label>
+            <div class="layui-input-block">
+                <input name="place" placeholder="请输入打卡地点" type="text" class="layui-input"
+                       lay-verify="required" required/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">打卡时间</label>
+            <div class="layui-input-block">
+                <input id="attendaddtime" name="attendTime" placeholder="请输入打卡时间" type="text" class="layui-input"
+                       lay-verify="required" required/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">打卡类型</label>
+            <div class="layui-input-block">
+                <input type="radio" name="type" value="正常" title="正常" checked/>
+                <input type="radio" name="type" value="迟到" title="迟到"/>
+                <input type="radio" name="type" value="早退" title="早退"/>
+                <input type="radio" name="type" value="请假" title="请假"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">内外勤</label>
+            <div class="layui-input-block">
+                <input type="radio" name="placeType" value="内勤" title="内勤" checked/>
+                <input type="radio" name="placeType" value="外勤" title="外勤"/>
+            </div>
+        </div>
+
+        <div class="layui-form-item text-right">
+            <button class="layui-btn layui-btn-primary" type="button" ew-event="closeDialog">取消</button>
+            <button class="layui-btn" lay-filter="attendAddFormSubmit" lay-submit>保存</button>
+        </div>
+    </form>
+</script>
 <!-- js部分 -->
 <script type="text/javascript" src="../../assets/libs/layui/layui.js"></script>
 <script type="text/javascript" src="../../assets/common.js"></script>
@@ -127,6 +182,10 @@
         var admin = layui.admin;
         var laydate=layui.laydate;
         var mRoles = [];  // 全部角色
+        var mShifts=[];//所有班次 启用
+        var mPlaces=[];//所有考勤地点 启用
+        var mStaffs=[];//所有状态正常员工
+
 
         // 渲染表格
         table.render({
@@ -145,6 +204,7 @@
                 {field: 'shiftName', title: '班次名称',width:100},
                 {field: 'deptName', title: '部门名称',width:100},
                 {field: 'type', title: '打卡类型',width:100},
+                {field: 'placeType', title: '内外勤',width:100},
                 {field: 'place', title: '打卡地点'},
                 {field: 'attendTime', title: '打卡时间'},
                 {
@@ -167,10 +227,53 @@
         });
 
         // 添加按钮点击事件
-        /*$('#userBtnAdd').click(function () {
+        $('#attendBtnAdd').click(function () {
             showAddModel();
-        });*/
+        });
+        // 显示表单弹窗
+        function showAddModel() {
+            layer.open({
+                type: 1,
+                area: '360px',
+                offset: '65px',
+                title: '补考勤记录',
+                content: $('#attendAddForm').html(),
+                success: function (layero, index) {
+                    $(layero).children('.layui-layer-content').css('overflow', 'visible');
+                    form.render('radio');
 
+                    //回显shift
+                    var shiftSelData=new Array();
+                    for (var i=0;i<mShifts.length;i++){
+                        shiftSelData.push({name:mShifts[i].shiftName,value:mShifts[i].shiftId});
+                    }
+                    for(var i=0;i<shiftSelData.length;i++){
+                        $('#selShift').append("<option value='"+shiftSelData[i].value+"'>"+shiftSelData[i].name+"</option>");
+                    }
+                    form.render();
+                    // 表单提交事件
+                    form.on('submit(attendAddFormSubmit)', function (d) {
+                        layer.load(2);
+                        admin.req('attend/insert', d.field, function (res) {
+                            layer.closeAll('loading');
+                            if (res.code == 200) {
+                                layer.msg(res.msg, {icon: 1});
+                                layer.closeAll('page');
+                                table.reload('attendTable');
+                            } else {
+                                layer.msg(res.msg, {icon: 2});
+                            }
+                        }, 'POST');
+                        return false;
+                    });
+                }
+            });
+            //执行一个laydate实例
+            laydate.render({
+                elem: '#attendaddtime', //指定元素
+                type: 'datetime'     //指定选择器类型
+            });
+        }
         // 工具条点击事件
         table.on('tool(attendTable)', function (obj) {
             var data = obj.data;
@@ -234,6 +337,44 @@
             });
         }
 
+        //获取所有状态正常员工
+        admin.req('staff/queryAll', {}, function (res) {
+            layer.closeAll('loading');
+            if (0 == res.code) {
+                mStaffs = res.data;
+                for(var i=0;i<mStaffs.length;i++) {
+                    console.log("员工:"+mStaffs[i].staffName);
+                }
+            } else {
+                layer.msg('获取状态正常员工失败', {icon: 2});
+            }
+        }, 'GET');
+
+        //获取所有启用考勤地点
+        admin.req('place/queryAll', {}, function (res) {
+            layer.closeAll('loading');
+            if (200 == res.code) {
+                mPlaces = res.data;
+                for(var i=0;i<mPlaces.length;i++) {
+                    console.log("考勤地点:"+mPlaces[i].name);
+                }
+            } else {
+                layer.msg('获取考勤地点失败', {icon: 2});
+            }
+        }, 'GET');
+
+        //获取所有启用班次
+        admin.req('shift/queryAll', {}, function (res) {
+            layer.closeAll('loading');
+            if (200 == res.code) {
+                mShifts = res.data;
+                for(var i=0;i<mShifts.length;i++) {
+                    console.log("考勤班次:"+mShifts[i].shiftName);
+                }
+            } else {
+                layer.msg('获取班次失败', {icon: 2});
+            }
+        }, 'GET');
 
     });
 </script>

@@ -9,4 +9,6 @@ public interface DeptService extends IService<Dept> {
 
     void logicDelete(Integer deptId);
     void updateStatu(Integer deptId,Integer statu);
+    Dept queryByDeptName(String deptName);
+    Dept queryByDeptId(Integer deptId);
 }

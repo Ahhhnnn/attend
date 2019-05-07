@@ -1,0 +1,37 @@
+/** 登录界面样式 */
+.login-logo {
+    text-align: center;
+    margin-top: 60px;
+}
+
+.login-logo img {
+    width: 50px;
+    height: 50px;
+}
+
+.login-logo cite {
+    font-style: normal;
+    font-weight: bold;
+    color: #666;
+    padding-left: 10px;
+    font-size: 28px;
+    vertical-align: middle;
+}
+
+.login-form {
+    width: 255px;
+    margin: 30px auto;
+    background: white;
+    border-radius: 10px;
+    padding: 40px 50px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .15);
+}
+
+.login-form .title {
+    font-size: 20px;
+    color: #333;
+    font-weight: bold;
+    padding-bottom: 15px;
+}
+
+/** //登录界面样式结束 */
