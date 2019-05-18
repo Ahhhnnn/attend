@@ -11,6 +11,7 @@
 	<groupId>com.he</groupId>
 	<artifactId>attend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<name>attend</name>
 	<description>Demo project for Spring Boot</description>
 
@@ -130,7 +131,11 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>com.he.attend.AttendApplication</mainClass>
+				</configuration>
 			</plugin>
+
 		</plugins>
 	</build>
 

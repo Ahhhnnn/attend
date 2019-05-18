@@ -18,4 +18,6 @@ public interface StaffService extends IService<Staff> {
     List<Staff> queryByDeptId(Integer deptId);
 
     List<Staff> queryByStaffIds(List<Integer> staffIds);
+
+    Integer queryStaffNum();
 }

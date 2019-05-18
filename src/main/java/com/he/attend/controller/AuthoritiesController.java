@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.he.attend.common.BaseController;
 import com.he.attend.common.JsonResult;
 import com.he.attend.common.PageResult;
+import com.he.attend.common.utils.PowerUtil;
 import com.he.attend.common.utils.ReflectUtil;
 import com.he.attend.model.Authorities;
 import com.he.attend.model.RoleAuthorities;
@@ -19,6 +20,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +74,12 @@ public class AuthoritiesController extends BaseController {
             @ApiImplicitParam(name = "access_token", value = "令牌", required = true, dataType = "String", paramType = "query")
     })
     @GetMapping
-    public PageResult<Map<String, Object>> list(Integer roleId) {
+    public PageResult<Map<String, Object>> list(Integer roleId,HttpServletRequest request) {
+        /*String authority="delete:/authorities/role";
+        boolean canDo = PowerUtil.powerPermisson(authority,request);
+        if(!canDo){
+            return  JsonResult.error("没有相应权限");
+        }*/
         List<Map<String, Object>> maps = new ArrayList<>();
         List<Authorities> authorities = authoritiesService.selectList(null);
         List<String> roleAuths = authoritiesService.listByRoleId(roleId);
@@ -97,7 +104,12 @@ public class AuthoritiesController extends BaseController {
             @ApiImplicitParam(name = "access_token", value = "令牌", required = true, dataType = "String", paramType = "form")
     })
     @PostMapping("/role")
-    public JsonResult addRoleAuth(Integer roleId, String authId) {
+    public JsonResult addRoleAuth(Integer roleId, String authId,HttpServletRequest request) {
+        String authority="post:/authorities/role";
+        boolean canDo = PowerUtil.powerPermisson(authority,request);
+        if(!canDo){
+            return  JsonResult.error("没有对应的权限");
+        }
         RoleAuthorities roleAuth = new RoleAuthorities();
         roleAuth.setRoleId(roleId);
         roleAuth.setAuthority(authId);
@@ -114,7 +126,12 @@ public class AuthoritiesController extends BaseController {
             @ApiImplicitParam(name = "access_token", value = "令牌", required = true, dataType = "String", paramType = "query")
     })
     @DeleteMapping("/role")
-    public JsonResult deleteRoleAuth(String roleId, String authId) {
+    public JsonResult deleteRoleAuth(String roleId, String authId, HttpServletRequest request) {
+        String authority="delete:/authorities/role";
+        boolean canDo = PowerUtil.powerPermisson(authority,request);
+        if(!canDo){
+            return  JsonResult.error("没有相应权限");
+        }
         if (roleAuthoritiesService.delete(new EntityWrapper<RoleAuthorities>().eq("role_id", roleId).eq("authority", authId))) {
             return JsonResult.ok();
         }

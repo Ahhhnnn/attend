@@ -99,20 +99,27 @@
 
 
          $('#monthReConculate').click(function () {
-             layer.load(0);
-             var month=$('#month').val();
+             //提示
+             layer.confirm('重新计算月报会花费几分钟的时间，确定重新计算吗?', {icon: 3, title:'提示'}, function(index){
+                 console.log("index"+index);
+                 layer.close(index);
+                 layer.load(0);
+                 var month=$('#month').val();
 
-             admin.req('month/insert', {month:month}, function (res) {
-                 if (200 == res.code) {
-                     layer.closeAll('loading');
-                     layer.msg(res.msg, {icon: 1, time: 1000}, function () {
-                         location.reload();
-                     });
 
-                 } else {
-                     layer.msg(data.msg, {icon: 2});
-                 }
-             }, 'POST');
+                 admin.req('month/insert', {month:month}, function (res) {
+                     if (200 == res.code) {
+                         layer.closeAll('loading');
+                         layer.msg(res.msg, {icon: 1, time: 1000}, function () {
+                             location.reload();
+                         });
+
+                     } else {
+                         layer.msg(data.msg, {icon: 2});
+                     }
+                 }, 'POST');
+             });
+
          });
 
     });

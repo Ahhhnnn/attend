@@ -3,6 +3,7 @@ package com.he.attend.service.impl;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import com.he.attend.common.utils.DateUtil;
 import com.he.attend.dao.AttendMapper;
 import com.he.attend.dao.StaffMapper;
 import com.he.attend.model.Attend;
@@ -11,6 +12,7 @@ import com.he.attend.service.AttendService;
 import com.he.attend.service.StaffService;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -29,5 +31,14 @@ public class AttendServiceImpl extends ServiceImpl<AttendMapper, Attend> impleme
         entityWrapper.like("attend_time",attendDay);
         entityWrapper.orderBy("attend_time",false);
         return baseMapper.selectList(entityWrapper);
+    }
+
+    @Override
+    public List<Attend> queryTodayAttend() {
+        Date today=new Date();
+        String todayString = DateUtil.formatDate(today,"yyyy-MM-dd");
+        EntityWrapper<Attend> attendEntityWrapper=new EntityWrapper<Attend>();
+        attendEntityWrapper.like("attend_time",todayString);
+        return baseMapper.selectList(attendEntityWrapper);
     }
 }

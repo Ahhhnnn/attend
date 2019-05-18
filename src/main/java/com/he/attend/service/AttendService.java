@@ -11,4 +11,5 @@ public interface AttendService extends IService<Attend> {
 
     void logicDelete(Integer attendId);
     List<Attend> queryByStaffIdAndAttendDay(Integer staffId, String attendDay);
+    List<Attend> queryTodayAttend();
 }

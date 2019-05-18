@@ -47,6 +47,8 @@ public class MonthController {
 
     @Autowired
     private CalendarService calendarService;
+    @Autowired
+    private RuleService ruleService;
     
     @RequestMapping("/query")
     public PageResult<MonthReport> list(Integer page, Integer limit, String searchKey, String searchValue,String month) {
@@ -164,6 +166,8 @@ public class MonthController {
      * @return 返回list  0：应出勤工时 1：出勤工时， 2：缺勤工时 3 ：旷工天数
      */
     private List<String> calculateWorkHour(Staff staff,String month){
+        long longStartTime=System.currentTimeMillis();
+
         int year=Integer.valueOf(month.split("-")[0]);
         int inmonth=Integer.valueOf(month.split("-")[1]);
 
@@ -179,38 +183,51 @@ public class MonthController {
             entityWrapper.eq("staff_id",staff.getStaffId());
             entityWrapper.like("attend_time",day);
             List<Attend> attendList=attendService.selectList(entityWrapper);
+            EntityWrapper<AttendCalendar> calendatWrapper=new EntityWrapper<AttendCalendar>();
+            calendatWrapper.eq("day",day);
+            calendatWrapper.eq("staff_id",staff.getStaffId());
+            List<AttendCalendar> calendarList=calendarService.selectList(calendatWrapper);
 
             if(attendList.size()>1){ //有两条打卡记录 打卡正常
                 String firstAttend=attendList.get(0).getAttendTime();
                 String secAttend=attendList.get(1).getAttendTime();
-                EntityWrapper<AttendCalendar> calendatWrapper=new EntityWrapper<AttendCalendar>();
-                calendatWrapper.eq("day",day);
-                calendatWrapper.eq("staff_id",staff.getStaffId());
-                List<AttendCalendar> calendarList=calendarService.selectList(calendatWrapper);
-                if(!CollectionUtils.isEmpty(calendarList)) {
-                    AttendCalendar attendCalendar = calendarList.get(0);//有打卡记录就一定有排班
+
+                if(!CollectionUtils.isEmpty(calendarList)){
+                    /*AttendCalendar attendCalendar = calendarList.get(0);//有打卡记录就一定有排班
                     Integer shiftId = attendCalendar.getShiftId();
-                    Shift shift = shiftService.getShiftById(shiftId);
-
-                    long hour = DateUtil.dateDiff(shift.getBeginTime(), shift.getEndTime(), "HH:mm:ss", "h");//应该工作工时
+                    Shift shift = shiftService.getShiftById(shiftId);*/
+                    /*long hour = DateUtil.dateDiff(shift.getBeginTime(), shift.getEndTime(), "HH:mm:ss", "h");*///应该工作工时
                     long relHour = DateUtil.dateDiff(firstAttend, secAttend, "yyyy-MM-dd HH:mm:ss", "h");
-                    long notHour = 0;
-                    if (hour > relHour) {
-                        notHour = hour - relHour;
-                    } else {
-                        notHour = 0;
-                    }
-
                     relWorkHour += relHour;
-                    notWorkHour += notHour;
+                }else {
+                    //如果今日没有排班 但是打了卡 也要计算工时
+                    long relHour = DateUtil.dateDiff(firstAttend, secAttend, "yyyy-MM-dd HH:mm:ss", "h");
+                    relWorkHour += relHour;
                 }
+
             }else if(attendList.size()==1){//
                 //一次打卡 缺考勤
 
-
             }else if(attendList.size()==0){
-                //0次打卡视为旷工
-                notWorkNum+=1;
+                //0次打卡 且今日有排班
+                if(!CollectionUtils.isEmpty(calendarList)) {
+                    //正常工作日对应结果为 0, 法定节假日对应结果为 1, 节假日调休补班对应的结果为 2，休息日对应结果为 3
+                    AttendCalendar attendCalendar = calendarList.get(0);//有打卡记录就一定有排班
+                    Rule rule=ruleService.selectList(new EntityWrapper<Rule>().eq("rule_id",attendCalendar.getRuleId())).get(0);
+                    Integer isAttend=DateUtil.isHolidayByInterface(day);
+                    if(isAttend==3){//如果是周末 判断周末是否打卡
+                        if(rule.getIsWeekendAttend()==1){ //等于1  表示需要打卡
+                            notWorkNum += 1;
+                        }
+                    }else if(isAttend==1){
+                        if(rule.getIsHolidayAttend()==1){//等于1  表示需要打卡
+                            notWorkNum += 1;
+                        }
+                    }else if(isAttend==0||isAttend==2){
+                        notWorkNum += 1;
+                    }
+
+                }
             }
 
         }
@@ -220,17 +237,41 @@ public class MonthController {
         calendatWrapper.eq("staff_id",staff.getStaffId());
         List<AttendCalendar> calendarList=calendarService.selectList(calendatWrapper);
         for(AttendCalendar attendCalendar :calendarList){
-            Integer shiftId=attendCalendar.getShiftId();
-            Shift shift=shiftService.getShiftById(shiftId);
-            long hour= DateUtil.dateDiff(shift.getBeginTime(),shift.getEndTime(),"HH:mm:ss","h");//应该工作工时
-            shoudWorkHour+=hour;
+            //判断是否是周六日或公休日
+            Rule rule=ruleService.selectList(new EntityWrapper<Rule>().eq("rule_id",attendCalendar.getRuleId())).get(0);
+            //正常工作日对应结果为 0, 法定节假日对应结果为 1, 节假日调休补班对应的结果为 2，休息日对应结果为 3
+            Integer isAttend=DateUtil.isHolidayByInterface(attendCalendar.getDay());
+            Integer shiftId = attendCalendar.getShiftId();
+            Shift shift = shiftService.getShiftById(shiftId);
+            if(isAttend==3){//如果是周末 判断周末是否打卡
+                if(rule.getIsWeekendAttend()==1){ //等于1  表示需要打卡
+                    long hour = DateUtil.dateDiff(shift.getBeginTime(), shift.getEndTime(), "HH:mm:ss", "h");//应该工作工时
+                    shoudWorkHour += hour;
+                }
+            }else if(isAttend==1){
+                if(rule.getIsHolidayAttend()==1){//等于1  表示需要打卡
+                    long hour = DateUtil.dateDiff(shift.getBeginTime(), shift.getEndTime(), "HH:mm:ss", "h");//应该工作工时
+                    shoudWorkHour += hour;
+                }
+            }else if(isAttend==0||isAttend==2){
+                long hour = DateUtil.dateDiff(shift.getBeginTime(), shift.getEndTime(), "HH:mm:ss", "h");//应该工作工时
+                shoudWorkHour += hour;
+            }
         }
 
         List<String> allList=new ArrayList<>();
-        allList.add(String.valueOf(shoudWorkHour));
-        allList.add(String.valueOf(relWorkHour));
-        allList.add(String.valueOf(notWorkHour));
+        allList.add(String.valueOf(Math.abs(shoudWorkHour)));
+        allList.add(String.valueOf(Math.abs(relWorkHour)));
+        //缺勤工时=应出勤工时-实际出勤工时
+        notWorkHour=Math.abs(shoudWorkHour)-Math.abs(relWorkHour);
+        if(notWorkHour<0){
+            allList.add(String.valueOf(0));
+        }else {
+            allList.add(String.valueOf(Math.abs(notWorkHour)));
+        }
         allList.add(String.valueOf(notWorkNum));
+        long longEndTime=System.currentTimeMillis();
+        log.error("calculateWorkHour方法耗时:"+String.valueOf(longEndTime-longStartTime));
         return allList;
     }
 }

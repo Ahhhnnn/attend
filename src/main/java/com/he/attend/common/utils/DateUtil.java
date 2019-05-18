@@ -20,6 +20,14 @@
  */
 package com.he.attend.common.utils;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -31,6 +39,7 @@ import java.util.*;
  * @date 2017-4-1 下午2:37:33
  */
 public class DateUtil {
+
 	/**
 	 * 得到当前时间(yyyy-MM-dd HH:mm:ss)
 	 * @return
@@ -417,5 +426,85 @@ public class DateUtil {
 		} else {
 			return min;
 		}
+	}
+
+	/**
+	 * 判断是否是周六周日
+	 */
+	public static boolean isStraOrSunDay(String day){
+		SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd");
+
+		try {
+			Date date=simpleDateFormat.parse(day);
+			Calendar cal=Calendar.getInstance();
+			cal.setTime(date);
+			if(cal.get(Calendar.DAY_OF_WEEK)==Calendar.SATURDAY||cal.get(Calendar.DAY_OF_WEEK)==Calendar.SUNDAY){
+				return true;
+			}else {
+				return false;
+			}
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+
+	/**
+	 * 判断日期是否在公休日
+	 * @param day
+	 * @return
+	 */
+	public static boolean isHoliday(String day){
+		//维护2019年 节假日
+		String[] holidayArray={"2019-01-01","2019-02-04","2019-02-05","2019-02-06","2019-02-07","2019-02-08","2019-02-09","2019-02-10",
+				"2019-04-05","2019-04-06","2019-04-07","2019-05-01","2019-05-02","2019-05-03","2019-05-04","2019-06-07","2019-06-08",
+				"2019-06-09","2019-09-13","2019-09-14","2019-09-15","2019-10-01","2019-10-02","2019-10-03","2019-10-04","2019-10-05",
+				"2019-10-06","2019-10-07"};
+		List<String> holidayList=Arrays.asList(holidayArray);
+		if(holidayList.contains(day)){
+			return true;
+		}else {
+			return false;
+		}
+
+	}
+
+	/**
+	 * 判断日期是否在公休日
+	 * @param day
+	 * @return 正常工作日对应结果为 0, 法定节假日对应结果为 1, 节假日调休补班对应的结果为 2，休息日对应结果为 3
+	 */
+	public static Integer isHolidayByInterface(String day){
+		BufferedReader reader = null;
+		String result = null;
+		StringBuffer sbf = new StringBuffer();
+		String dayreplace=day.replaceAll("-","");
+		String httpUrl="http://api.goseek.cn/Tools/holiday?date="+dayreplace;
+
+		try {
+			URL url = new URL(httpUrl);
+			HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+			connection.setRequestMethod("GET");
+			// 填入apikey到HTTP header
+			connection.setRequestProperty("apikey", "abfa5282a89706affd2e4ad6651c9648");
+			connection.connect();
+			InputStream is = connection.getInputStream();
+			reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+			String strRead = null;
+			while ((strRead = reader.readLine()) != null) {
+				sbf.append(strRead);
+				sbf.append("\r\n");
+			}
+			reader.close();
+			result = sbf.toString();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		//正常工作日对应结果为 0, 法定节假日对应结果为 1, 节假日调休补班对应的结果为 2，休息日对应结果为 3
+		JSONObject jsonObject= JSONObject.parseObject(result);
+
+		return (Integer) jsonObject.get("data");
+
 	}
 }

@@ -45,4 +45,9 @@ public class StaffServiceImpl extends ServiceImpl<StaffMapper, Staff> implements
         entityWrapper.in("staff_id",staffIds);
         return baseMapper.selectList(entityWrapper);
     }
+
+    @Override
+    public Integer queryStaffNum() {
+        return baseMapper.queryStaffNum();
+    }
 }

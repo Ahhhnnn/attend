@@ -14,8 +14,8 @@
 
 <body>
 <div class="login-logo">
-    <img src="assets/images/logo.png">
-    <cite>前后端分离开发平台</cite>
+    <!--<img src="assets/images/logo.png">-->
+    <cite>考勤管理工作台</cite>
 </div>
 <div class="login-form">
     <div class="title">用户登录</div>
@@ -42,9 +42,9 @@
         var form = layui.form;
         var admin = layui.admin;
 
-        if (admin.getToken()) {
+        /*if (admin.getToken()) {
             goIndex();
-        }
+        }*/
 
         // 监听表单提交
         form.on('submit(loginSubmit)', function (data) {

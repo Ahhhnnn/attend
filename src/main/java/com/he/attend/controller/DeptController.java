@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.he.attend.common.JsonResult;
 import com.he.attend.common.PageResult;
+import com.he.attend.common.utils.PowerUtil;
 import com.he.attend.model.Attend;
 import com.he.attend.model.Dept;
 import com.he.attend.model.Rule;
@@ -20,6 +21,7 @@ import org.apache.tomcat.util.digester.Rules;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
@@ -42,8 +44,12 @@ public class DeptController {
      * @return
      */
     @RequestMapping(value = "/insert" )
-    public PageResult insertDept(Dept dept){
-
+    public PageResult insertDept(Dept dept, HttpServletRequest request){
+        String authority="post:/dept/insert";
+        boolean canDo = PowerUtil.powerPermisson(authority,request);
+        if(!canDo){
+            return new PageResult("没有相应的权限",400);
+        }
         if(checkDeptIsExist(dept,0)){
             return new PageResult("该部门编号或部门名已存在",400);
         }
@@ -60,7 +66,12 @@ public class DeptController {
             @ApiImplicitParam(name = "access_token", value = "令牌", required = true, dataType = "String", paramType = "form")
     })
     @PutMapping("/statu")
-        public JsonResult updateState(Integer deptId, Integer statu) {
+        public JsonResult updateState(Integer deptId, Integer statu,HttpServletRequest request) {
+        String authority="put:/dept/statu";
+        boolean canDo = PowerUtil.powerPermisson(authority,request);
+        if(!canDo){
+            return JsonResult.error("没有相应的权限");
+        }
         if (statu == null || (statu != 0 && statu != 1)) {
             return JsonResult.error("state值需要在[0,1]中");
         }
@@ -79,8 +90,12 @@ public class DeptController {
      * @return
      */
     @RequestMapping(value = "/update" )
-    public PageResult updateDept(Dept dept){
-
+    public PageResult updateDept(Dept dept,HttpServletRequest request){
+        String authority="put:/dept/update";
+        boolean canDo = PowerUtil.powerPermisson(authority,request);
+        if(!canDo){
+            return new PageResult("没有相应的权限",400);
+        }
         if(checkDeptIsExist(dept,1)){
             return new PageResult("该部门编号或部门名已存在",400);
         }
@@ -96,7 +111,12 @@ public class DeptController {
      * @return
      */
     @RequestMapping("/delete/{deptId}")
-    public PageResult delteDept(@PathVariable("deptId") Integer deptId){
+    public PageResult delteDept(@PathVariable("deptId") Integer deptId,HttpServletRequest request){
+        String authority="delete:/dept/delete";
+        boolean canDo = PowerUtil.powerPermisson(authority,request);
+        if(!canDo){
+            return new PageResult("没有相应的权限",400);
+        }
         try {
             deptService.logicDelete(deptId);
             return new PageResult("删除成功",200);
@@ -167,7 +187,12 @@ public class DeptController {
      * @return
      */
     @RequestMapping("/queryByDeptId")
-    public PageResult<Staff> queryByDeptId(Integer page, Integer limit,Integer deptId){
+    public PageResult<Staff> queryByDeptId(Integer page, Integer limit,Integer deptId,HttpServletRequest request){
+        String authority="get:/dept/queryByDeptId";
+        boolean canDo = PowerUtil.powerPermisson(authority,request);
+        if(!canDo){
+            return new PageResult("没有相应的权限",400);
+        }
         if (page == null) {
             page = 0;
         }
@@ -194,12 +219,17 @@ public class DeptController {
         List<Dept> depts=deptService.selectList(wrapper);
 
         for (Dept dept1:depts){
-            if(dept.getDeptId().equals(dept1.getDeptId())){
-               return true;
+            if(isInsetOrUpdate==1) {
+                if (dept.getDeptId().equals(dept1.getDeptId())) {
+                    return true;
+                }
             }
             //如果是新增部门判断是否名称相同
             if(isInsetOrUpdate==0) {
                 if (dept.getDeptName().equals(dept1.getDeptName())) {
+                    return true;
+                }
+                if (dept.getDeptId().equals(dept1.getDeptId())) {
                     return true;
                 }
             }

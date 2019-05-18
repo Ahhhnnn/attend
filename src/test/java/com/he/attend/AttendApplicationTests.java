@@ -1,6 +1,7 @@
 package com.he.attend;
 
 import com.he.attend.common.utils.DataUtils;
+import com.he.attend.common.utils.DateUtil;
 import com.he.attend.service.CalendarService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,6 +34,14 @@ public class AttendApplicationTests {
 		DataUtils dataUtils=new DataUtils();
 		List<String> daysList=dataUtils.getDays("2018-04-12","2018-05-20");
 		System.out.println(daysList);
+	}
+
+
+	@Test
+	public void testIsHoliday(){
+
+		Integer result= DateUtil.isHolidayByInterface("2019-05-05");
+		System.out.println(result);
 	}
 }
 

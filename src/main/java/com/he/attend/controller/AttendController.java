@@ -6,6 +6,7 @@ package com.he.attend.controller;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.he.attend.common.PageResult;
+import com.he.attend.common.utils.DateUtil;
 import com.he.attend.model.*;
 import com.he.attend.service.AttendService;
 import com.he.attend.service.DeptService;
@@ -43,6 +44,8 @@ public class AttendController {
     @RequestMapping("insert")
     public PageResult insert(Attend attend){
 
+
+
         String staffName=attend.getStaffName();
         Staff staff=staffService.getByStaffName(staffName);
         Dept dept=deptService.queryByDeptId(staff.getDeptId());
@@ -51,6 +54,9 @@ public class AttendController {
         attend.setDeptId(dept.getDeptId());
         attend.setDeptName(dept.getDeptName());
         attend.setShiftName(shift.getShiftName());
+
+        //插入前判断已有多少条考勤记录
+        setAttend(attend);
         if(attendService.insert(attend)){
             return new PageResult("补考勤成功",200);
         }
@@ -104,7 +110,7 @@ public class AttendController {
             }
         }
         wrapper.eq("dr",0);
-        wrapper.orderBy("createTime", false);
+        wrapper.orderBy("attend_time",true);
         attendService.selectPage(attendPage, wrapper);
         List<Attend> attendsList = attendPage.getRecords();
         return new PageResult<>(attendsList, attendPage.getTotal());
@@ -138,5 +144,32 @@ public class AttendController {
         return new PageResult<Attend>(200,"查询成功",finalAttendList.size(),finalAttendList);
     }
 
+
+    private void setAttend(Attend attend){
+
+        Integer staffId=attend.getStaffId();
+        String attendTime=attend.getAttendTime();
+        EntityWrapper<Attend> attendEntityWrapper=new EntityWrapper<Attend>();
+        attendEntityWrapper.eq("staff_id",staffId);
+        attendEntityWrapper.like("attend_time",attendTime.split(" ")[0]);
+        attendEntityWrapper.orderBy("attend_time");
+        List<Attend> attendList=attendService.selectList(attendEntityWrapper);
+        //判断考勤记录有多少条
+        if(attendList.size()<=1){
+            return;
+        }else { //如果有两条考勤记录 删除一条再插入
+            //判断打卡时间的大小
+            if(DateUtil.compareToDate(attendTime,attendList.get(0).getAttendTime(),"yyyy-MM-dd HH:mm:ss")==-1){
+                //如果补考勤时间比 打卡记录第一条时间早，删除第一条考勤记录
+                attendService.deleteById(attendList.get(0).getAttendId());
+            }else if(DateUtil.compareToDate(attendTime,attendList.get(1).getAttendTime(),"yyyy-MM-dd HH:mm:ss")==1){
+                //如果补考勤时间 比打卡记录第二条晚 ， 删除第二条考勤记录
+                attendService.deleteById(attendList.get(1).getAttendId());
+            }else {
+                //如果在两条打卡时间 中间   无意义
+                //TODO
+            }
+        }
+    }
 
 }

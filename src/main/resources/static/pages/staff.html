@@ -42,15 +42,15 @@
 
 <!-- 表格操作列 -->
 <script type="text/html" id="tableBar">
-   <!-- <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="reset">重置密码</a>-->
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="reset">重置密码</a>
     <a class="layui-btn layui-btn-primary layui-btn-sm" lay-event="edit">修改</a>
     <a class="layui-btn layui-btn-danger layui-btn-sm" lay-event="del">删除</a>
 </script>
 <!-- 表格状态列 -->
-<script type="text/html" id="tbaleState">
+<!--<script type="text/html" id="tbaleState">
     <input type="checkbox" lay-filter="ckState" lay-skin="switch" lay-text="正常|锁定"
            value="{{d.staffId}}" {{d.state==0?'checked':''}}/>
-</script>
+</script>-->
 <!-- 表单弹窗 -->
 <script type="text/html" id="userForm">
     <form lay-filter="userForm" class="layui-form model-form">
@@ -156,7 +156,7 @@
                         return util.toDateString(d.createTime);
                     }, title: '创建时间'
                 },
-                {field: 'state', templet: '#tbaleState', title: '状态', unresize: true, width: 100},
+                /*{field: 'state', templet: '#tbaleState', title: '状态', unresize: true, width: 100},*/
                 {align: 'center', toolbar: '#tableBar', title: '操作', unresize: true, width: 200}
             ]],
             skin: 'line',
@@ -194,11 +194,11 @@
                         }
                     }, 'DELETE');
                 });
-            }/* else if (layEvent === 'reset') { // 重置密码
-                layer.confirm('确定重置此用户的密码吗？<br><span style="color: red;">（初始密码为123456）</span>', function (i) {
+            } else if (layEvent === 'reset') { // 重置密码
+                layer.confirm('确定重置此员工的密码吗？<br><span style="color: red;">（初始密码为123456）</span>', function (i) {
                     layer.close(i);
                     layer.load(2);
-                    admin.req('user/psw/' + obj.data.userId, {}, function (data) {
+                    admin.req('staff/psw/' + obj.data.staffId, {}, function (data) {
                         layer.closeAll('loading');
                         if (data.code == 200) {
                             layer.msg(data.msg, {icon: 1});
@@ -207,7 +207,7 @@
                         }
                     }, 'PUT');
                 });
-            }*/ else if (layEvent === 'edit') { // 修改
+            } else if (layEvent === 'edit') { // 修改
                 showEditModel(data);
             }
         });

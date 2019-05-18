@@ -21,7 +21,32 @@
                 <!--<a href="https://easyweb.vip" target="_blank" id="ag">
                     <i class="layui-icon layui-icon-website"></i>
                 </a>-->
-                <a lay-href="pages/dept.html">部门管理</a>
+                <a href="">系统管理</a>
+                <dl class="layui-nav-child">
+                    <dd><a lay-href="pages/user.html">用户管理</a></dd>
+                    <dd><a lay-href="pages/role.html">角色管理</a></dd>
+                    <dd><a lay-href="pages/dept.html">部门管理</a></dd>
+                    <dd><a lay-href="pages/staff.html">员工管理</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item" lay-unselect style="margin-left: 20px">
+                <a href="">考勤管理</a>
+                <dl class="layui-nav-child">
+                    <dd><a lay-href="pages/attend/attendshift.html">考勤班次</a></dd>
+                    <dd><a lay-href="pages/attend/attendplace.html">考勤地点</a></dd>
+                    <dd><a lay-href="pages/attend/attend.html">考勤记录</a></dd>
+                    <dd><a lay-href="pages/attend/attendcalendar.html">人员排班</a></dd>
+                    <dd><a lay-href="pages/attend/calendar.html">查看排班</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item" lay-unselect style="margin-left: 20px">
+                <a href="">数据统计</a>
+                <dl class="layui-nav-child">
+                    <dd><a lay-href="pages/attend/ranking.html">考勤排行榜</a></dd>
+                    <dd><a lay-href="pages/attend/day.html">日报统计</a></dd>
+                    <dd><a lay-href="pages/attend/month.html">月报统计</a></dd>
+                    <dd><a lay-href="javascript:;">可视化界面</a></dd>
+                </dl>
             </li>
         </ul>
         <ul class="layui-nav layui-layout-right">
@@ -63,6 +88,7 @@
                 <li class="layui-nav-item">
                     <a><i class="layui-icon layui-icon-list"></i>&emsp;数据统计</a>
                     <dl class="layui-nav-child">
+                        <dd><a lay-href="/pages/attend/attendnum.html">可视化展示</a></dd>
                         <dd><a lay-href="/pages/attend/ranking.html">考勤排行榜</a></dd>
                         <dd><a lay-href="/pages/attend/day.html">日报统计</a></dd>
                         <dd><a lay-href="/pages/attend/month.html">月报统计</a></dd>
@@ -79,7 +105,7 @@
     </div>
 
     <div class="layui-body">
-        <iframe name="body" class="admin-iframe" src="pages/introduce.html" frameborder="0"></iframe>
+        <iframe name="body" class="admin-iframe" src="pages/introduce.html" frameborder="0" ></iframe>
     </div>
 </div>
 <!-- 修改密码弹窗 -->

@@ -1,5 +1,6 @@
 var tableName = 'easyweb-open';  // 本地缓存表名
-var base_server = 'http://localhost:8888/v1/';  // 接口地址
+/*var base_server = 'http://47.100.214.147:8888/v1/';  // 接口地址*/
+var base_server = 'http://127.0.0.1:8888/v1/';  // 接口地址
 
 // 配置layui模块所在的位置
 layui.config({

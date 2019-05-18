@@ -14,4 +14,8 @@
     <select id="loginByPsd" resultType="com.he.attend.model.Staff">
         select * from ts_staff where phone=#{phone} and password=#{password}
     </select>
+
+    <select id="queryStaffNum" resultType="integer">
+        select count(*) from ts_staff
+    </select>
 </mapper>

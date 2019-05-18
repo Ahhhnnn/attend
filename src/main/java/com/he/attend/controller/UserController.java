@@ -6,6 +6,7 @@ import com.he.attend.common.BaseController;
 import com.he.attend.common.JsonResult;
 import com.he.attend.common.PageResult;
 import com.he.attend.common.exception.BusinessException;
+import com.he.attend.common.utils.PowerUtil;
 import com.he.attend.model.Role;
 import com.he.attend.model.User;
 import com.he.attend.model.UserRole;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Api(value = "用户相关的接口", tags = "user")
 @RestController
@@ -45,7 +47,7 @@ public class UserController extends BaseController {
             @ApiImplicitParam(name = "access_token", value = "令牌", required = true, dataType = "String", paramType = "form")
     })
     @PostMapping("/query")
-    public PageResult<User> list(Integer page, Integer limit, String searchKey, String searchValue) {
+    public PageResult<User> list(Integer page, Integer limit, String searchKey, String searchValue,HttpServletRequest request) {
         if (page == null) {
             page = 0;
         }
@@ -90,7 +92,12 @@ public class UserController extends BaseController {
             @ApiImplicitParam(name = "access_token", value = "令牌", required = true, dataType = "String", paramType = "form")
     })
     @PostMapping()
-    public JsonResult add(User user, String roleIds) {
+    public JsonResult add(User user, String roleIds,HttpServletRequest request) {
+        String authority="post:/user";
+        boolean canDo = PowerUtil.powerPermisson(authority,request);
+        if(!canDo){
+            return  JsonResult.error("没有相应权限");
+        }
         String[] split = roleIds.split(",");
         user.setPassword(EndecryptUtils.encrytMd5("123456"));
         user.setState(null);
@@ -118,22 +125,52 @@ public class UserController extends BaseController {
             @ApiImplicitParam(name = "access_token", value = "令牌", required = true, dataType = "String", paramType = "form")
     })
     @PutMapping()
-    public JsonResult update(User user, String roleIds) {
-        String[] split = roleIds.split(",");
+    public JsonResult update(User user, String roleIds,HttpServletRequest request) {
+        String authority="put:/user";
+        boolean canDo = PowerUtil.powerPermisson(authority,request);
+        if(!canDo){
+            return JsonResult.error("没有相应的权限");
+        }
+        //修改后用户 拥有的新的权限
+        String[] newRoleArray = roleIds.split(",");
         user.setPassword(null);
         user.setState(null);
         user.setEmailVerified(null);
         if (userService.updateById(user)) {
             List<UserRole> userRoles = new ArrayList<>();
             List<String> ids = new ArrayList<>();
-            for (String roleId : split) {
+            EntityWrapper<UserRole> userRoleEntityWrapper=new EntityWrapper<UserRole>();
+            userRoleEntityWrapper.eq("user_id",user.getUserId());
+            List<UserRole> userRoleList=userRoleService.selectList(userRoleEntityWrapper);
+            //修改前用户拥有的权限
+            List<Integer> oldRoleIdList=userRoleList.stream().map(UserRole->UserRole.getRoleId()).collect(Collectors.toList());
+            List<Integer> needDeleteUserRoleList=new ArrayList<>();
+            List<Integer> newRoleList=new ArrayList<>();
+            for(String roleid:newRoleArray){
+                newRoleList.add(Integer.valueOf(roleid));
+            }
+            needDeleteUserRoleList.addAll(newRoleList);
+
+            for(Integer roleid:oldRoleIdList){
+                if(!needDeleteUserRoleList.contains(roleid)){
+                    needDeleteUserRoleList.add(roleid);
+                }
+            }
+
+            EntityWrapper<UserRole> entityWrapper=new EntityWrapper<UserRole>();
+            entityWrapper.in("role_id",needDeleteUserRoleList);
+            entityWrapper.eq("user_id",user.getUserId());
+            userRoleService.delete(entityWrapper);
+            for (String roleId : newRoleArray) {
+
                 UserRole userRole = new UserRole();
                 userRole.setRoleId(Integer.parseInt(roleId));
                 userRole.setUserId(user.getUserId());
                 userRoles.add(userRole);
                 ids.add(roleId);
+
             }
-            userRoleService.deleteBatchIds(ids);
+
             if (!userRoleService.insertBatch(userRoles)) {
                 throw new BusinessException("修改失败");
             }
@@ -149,7 +186,12 @@ public class UserController extends BaseController {
             @ApiImplicitParam(name = "access_token", value = "令牌", required = true, dataType = "String", paramType = "form")
     })
     @PutMapping("/state")
-    public JsonResult updateState(Integer userId, Integer state) {
+    public JsonResult updateState(Integer userId, Integer state,HttpServletRequest request) {
+        String authority="put:/user/state";
+        boolean canDo = PowerUtil.powerPermisson(authority,request);
+        if(!canDo){
+            return JsonResult.error("没有相应的权限");
+        }
         if (state == null || (state != 0 && state != 1)) {
             return JsonResult.error("state值需要在[0,1]中");
         }
@@ -170,6 +212,11 @@ public class UserController extends BaseController {
     })
     @PutMapping("/psw")
     public JsonResult updatePsw(String oldPsw, String newPsw, HttpServletRequest request) {
+        String authority="put:/user/psw";
+        boolean canDo = PowerUtil.powerPermisson(authority,request);
+        if(!canDo){
+            return JsonResult.error("没有相应的权限");
+        }
         if (!EndecryptUtils.encrytMd5(oldPsw).equals(userService.selectById(getLoginUserId(request)).getPassword())) {
             return JsonResult.error("原密码不正确");
         }
@@ -188,7 +235,12 @@ public class UserController extends BaseController {
             @ApiImplicitParam(name = "access_token", value = "令牌", required = true, dataType = "String", paramType = "form")
     })
     @PutMapping("/psw/{id}")
-    public JsonResult resetPsw(@PathVariable("id") Integer userId) {
+    public JsonResult resetPsw(@PathVariable("id") Integer userId,HttpServletRequest request) {
+        String authority="put:/user/psw/{id}";
+        boolean canDo = PowerUtil.powerPermisson(authority,request);
+        if(!canDo){
+            return JsonResult.error("没有相应的权限");
+        }
         User user = new User();
         user.setUserId(userId);
         user.setPassword(EndecryptUtils.encrytMd5("123456"));
@@ -204,7 +256,12 @@ public class UserController extends BaseController {
             @ApiImplicitParam(name = "access_token", value = "令牌", required = true, dataType = "String", paramType = "form")
     })
     @DeleteMapping("/{id}")
-    public JsonResult delete(@PathVariable("id") Integer userId) {
+    public JsonResult delete(@PathVariable("id") Integer userId,HttpServletRequest request) {
+        String authority="delete:/user{id}";
+        boolean canDo = PowerUtil.powerPermisson(authority,request);
+        if(!canDo){
+            return JsonResult.error("没有相应的权限");
+        }
         if (userService.deleteById(userId)) {
             return JsonResult.ok("删除成功");
         }

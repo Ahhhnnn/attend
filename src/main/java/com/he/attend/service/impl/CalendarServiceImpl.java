@@ -51,7 +51,7 @@ public class CalendarServiceImpl extends ServiceImpl<CalendarMapper, AttendCalen
      * @return
      */
     @Override
-    public boolean insert(List<Integer> staffIds, List<String> attendDays,Integer placeId, String placeName, Integer shiftId) {
+    public boolean insert(List<Integer> staffIds, List<String> attendDays,Integer placeId, String placeName, Integer shiftId,Integer ruleId) {
         Long startTime=System.currentTimeMillis();
         try {
             Shift shift=shiftService.getShiftById(shiftId);
@@ -60,6 +60,7 @@ public class CalendarServiceImpl extends ServiceImpl<CalendarMapper, AttendCalen
             for (Staff staff:staffList){
                 for (String attendDay:attendDays){
                     AttendCalendar calendar=new AttendCalendar();
+                    calendar.setRuleId(ruleId);
                     calendar.setPlaceId(placeId);
                     calendar.setPlaceName(placeName);
                     calendar.setStaffId(staff.getStaffId());

@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="../../assets/module/formSelects/formSelects-v4.css" media="all">
     <link rel="stylesheet" href="../../assets/common.css" media="all">
     <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=HhCMbCFIZflrA1SB39WFayweoIjoWCOP"></script>
+    <script type="text/javascript" src="http://developer.baidu.com/map/jsdemo/demo/convertor.js"></script>
 </head>
 
 <body>
@@ -249,6 +250,9 @@
             var geolocation = new BMap.Geolocation();
 
 
+           var longitude= document.getElementById('longitude').value;
+           var latitude= document.getElementById('latitude').value;
+
             var point = new BMap.Point(104.0868470, 30.6540320);
             map.centerAndZoom(point, 12); // 中心点
             // 添加带有定位的导航控件
@@ -353,17 +357,7 @@
                 }
             });
 
-            //显示百度地图
-            /*document.getElementById('relName').onfocus = allmap();
-            document.getElementById('relName').onblur = dismap();
-            function allmap() {
-                console.log("获取焦点")
-                document.getElementById('allmap').style.display = 'block';
-            }
-            function dismap() {
-                console.log("失去焦点")
-                document.getElementById('allmap').style.display = 'none';
-            }*/
+
             document.getElementById('relName').onclick = function () {
                 if (document.getElementById('allmap').style.display == 'none') {
                     document.getElementById('allmap').style.display = 'block';
@@ -415,16 +409,19 @@
             geolocation.getCurrentPosition(function (r) {
                 console.log("定位当前位置");
                 if (this.getStatus() == BMAP_STATUS_SUCCESS) {
-                    var mk = new BMap.Marker(r.point);
-                    console.log("r====="+r);
-                    console.log(r.point);
-                    map.addOverlay(mk);
-                    map.panTo(r.point);
-                    map.enableScrollWheelZoom(true);
+                        console.log("调用回调");
+                        console.log(r.point);
+                        var mk = new BMap.Marker(r.point);
+                        console.log("r=====" + r);
+                        console.log(r.point);
+                        map.addOverlay(mk);
+                        map.panTo(r.point);
+                        map.enableScrollWheelZoom(true);
                 }
                 else {
                     alert('failed' + this.getStatus());
                 }
+
             }, {enableHighAccuracy: true})
             map.addEventListener("click", showInfo);
 
@@ -460,16 +457,6 @@
             }
         }
 
-        // 获取所有角色
-        /*layer.load(2);
-        admin.req('role', {}, function (res) {
-            layer.closeAll('loading');
-            if (0 == res.code) {
-                mRoles = res.data;
-            } else {
-                layer.msg('获取角色失败', {icon: 2});
-            }
-        }, 'GET');*/
 
     });
 </script>

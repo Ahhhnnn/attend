@@ -55,7 +55,8 @@
 			events: function  click(start, end, timezone, callback) {
 			    console.log(start+" "+end);
                 $.ajax({
-                    url: 'http://localhost:8888/'+ 'appCalendar/querycalendar',
+                    /*url: 'http://47.100.214.147:8888/'+ 'appCalendar/querycalendar',*/
+                    url: 'http://127.0.0.1:8888/'+ 'appCalendar/querycalendar',
                     dataType: 'json',
                     data: {
                         // our hypothetical feed requires UNIX timestamps

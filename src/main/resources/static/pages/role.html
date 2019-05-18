@@ -22,7 +22,7 @@
             </div>
             <button id="btnSearch" class="layui-btn icon-btn"><i class="layui-icon">&#xe615;</i>搜索</button>
             <button id="btnAdd" class="layui-btn icon-btn"><i class="layui-icon">&#xe654;</i>添加</button>
-
+            <span style="margin-left: 100px;font-size: 20px;color: red;font-weight: bold;">修改角色权限后，重新登录后生效</span>
             <table class="layui-table" id="roleTable" lay-filter="roleTable"></table>
         </div>
     </div>
@@ -30,9 +30,9 @@
 
 <!-- 表格操作列 -->
 <script type="text/html" id="tableBar">
-    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="edit">修改</a>
-    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
-    <a class="layui-btn layui-btn-xs" lay-event="auth">接口权限</a>
+    <a class="layui-btn layui-btn-primary layui-btn-sm" lay-event="edit">修改</a>
+    <a class="layui-btn layui-btn-danger layui-btn-sm" lay-event="del">删除</a>
+    <a class="layui-btn layui-btn-sm" lay-event="auth">接口权限</a>
 </script>
 <!-- 表单弹窗 -->
 <script type="text/html" id="roleForm">
@@ -178,7 +178,7 @@
         function showPermDialog(roleId) {
             layer.open({
                 type: 1,
-                area: '630px',
+                area: '700px',
                 offset: '65px',
                 title: '角色权限管理',
                 content: $('#authModel').html(),
@@ -205,6 +205,7 @@
 
                     // 监听授权开关
                     form.on('switch(authState)', function (obj) {
+                        console.log();
                         layer.load(2);
                         admin.req('authorities/role', {
                             roleId: roleId,

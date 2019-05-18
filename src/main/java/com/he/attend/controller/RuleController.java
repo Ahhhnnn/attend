@@ -56,7 +56,12 @@ public class RuleController {
      */
     @RequestMapping("insert")
     public PageResult insert(Rule rule){
-
+        List<Rule> ruleList=ruleService.selectList(null);
+        for(Rule rule1:ruleList){
+            if(rule1.getRuleName().equals(rule.getRuleName())){
+                return new PageResult("规则名称重复，请重新输入",400);
+            }
+        }
         //通过班次id查询班次，设置rule中的班次名称
         Shift shift=shiftService.getShiftById(rule.getShiftId());
         rule.setShiftName(shift.getShiftName());
@@ -88,10 +93,18 @@ public class RuleController {
                 }
             }
         }
-        if(!calendarService.insert(staffIds,days,rule.getPlaceId(),rule.getPlaceName(),rule.getShiftId())){
-            return new PageResult("排班失败",400);
+
+        if(ruleService.insert(rule)){
+            EntityWrapper<Rule> ruleEntityWrapper=new EntityWrapper<Rule>();
+            ruleEntityWrapper.eq("rule_name",rule.getRuleName());
+            Rule lastRule=ruleService.selectList(ruleEntityWrapper).get(0);
+            if(!calendarService.insert(staffIds,days,rule.getPlaceId(),rule.getPlaceName(),rule.getShiftId(),lastRule.getRuleId())){
+                return new PageResult("排班失败",400);
+            }
         }
-        ruleService.insert(rule);
+
+
+
 
         return new PageResult("新增且排班成功",200);
     }
@@ -164,6 +177,16 @@ public class RuleController {
 
     @RequestMapping("update")
     public PageResult updateRule(Rule rule){
+        //如果部门和人员都为空则 提示必须选择一项
+        if(rule.getDeptIds().equals("")&&rule.getStaffIds().equals("")){
+            return new PageResult("请选择排班部门或人员");
+        }
+        /*List<Rule> ruleList=ruleService.selectList(null);
+        for(Rule rule1:ruleList){
+            if(rule1.getRuleName().equals(rule.getRuleName())){
+                return new PageResult("规则名称重复，请重新输入",400);
+            }
+        }*/
         //通过班次id查询班次，设置rule中的班次名称
         Shift shift=shiftService.getShiftById(rule.getShiftId());
         rule.setShiftName(shift.getShiftName());
@@ -180,7 +203,7 @@ public class RuleController {
         //重新排班，将修改后的开始至结束时间 所有人人员的排班删除后在重新插入
         List<Integer> staffIds=getFinalStaffIds(rule.getDeptIds(),rule.getStaffIds());
         if(calendarService.delete(staffIds,days)){//如果删除成功 就重新插入排班
-            if(!calendarService.insert(staffIds,days,rule.getPlaceId(),rule.getPlaceName(),rule.getShiftId())){
+            if(!calendarService.insert(staffIds,days,rule.getPlaceId(),rule.getPlaceName(),rule.getShiftId(),rule.getRuleId())){
                 return new PageResult("排班失败",400);
             }
         }else {//如果删除失败 返回排班失败
@@ -204,11 +227,15 @@ public class RuleController {
         List<Integer> staffIds=new ArrayList<>();
         List<Integer> finalStaffIds=new ArrayList<>();
         List<Integer> staffIdsInDepts=new ArrayList<>();
-        for(String deptid:deptId.split(",")){
-            deptIds.add(Integer.valueOf(deptid));
+        if(!deptId.equals("")) {
+            for (String deptid : deptId.split(",")) {
+                deptIds.add(Integer.valueOf(deptid));
+            }
         }
-        for(String staffid:staffId.split(",")){
-            staffIds.add(Integer.valueOf(staffid));
+        if(!staffId.equals("")) {
+            for (String staffid : staffId.split(",")) {
+                staffIds.add(Integer.valueOf(staffid));
+            }
         }
         //获取部门下的所有人员id
         for(Integer deptid:deptIds){

@@ -116,22 +116,30 @@ public class DayController {
                 calendatWrapper.eq("day",day);
                 calendatWrapper.eq("staff_id",staff.getStaffId());
                 List<AttendCalendar> calendarList=calendarService.selectList(calendatWrapper);
-                AttendCalendar attendCalendar=calendarList.get(0);//有打卡记录就一定有排班
-                Integer shiftId=attendCalendar.getShiftId();
-                Shift shift=shiftService.getShiftById(shiftId);
+                if(!CollectionUtils.isEmpty(calendarList)){
+                    AttendCalendar attendCalendar=calendarList.get(0);//有打卡记录就一定有排班
+                    Integer shiftId=attendCalendar.getShiftId();
+                    Shift shift=shiftService.getShiftById(shiftId);
 
-                long hour= DateUtil.dateDiff(shift.getBeginTime(),shift.getEndTime(),"HH:mm:ss","h");//应该工作工时
-                long relHour=DateUtil.dateDiff(firstAttend,secAttend,"yyyy-MM-dd HH:mm:ss","h");
-                long notWorkHour=0;
-                if(hour>relHour){
-                    notWorkHour=hour-relHour;
-                }else {
-                    notWorkHour=0;
+                    long hour= DateUtil.dateDiff(shift.getBeginTime(),shift.getEndTime(),"HH:mm:ss","h");//应该工作工时
+                    long relHour=DateUtil.dateDiff(firstAttend,secAttend,"yyyy-MM-dd HH:mm:ss","h");
+                    long notWorkHour=0;
+                    if(hour>relHour){
+                        notWorkHour=hour-relHour;
+                    }else {
+                        notWorkHour=0;
+                    }
+                    dayReport.setWorkHour(String.valueOf(Math.abs(relHour)));
+                    dayReport.setNotWorkHour(String.valueOf(notWorkHour));
+
+                    dayReportList.add(dayReport);
+                }else {//如果没有 排班 但是打 卡  计算工时 不计算缺勤工时
+                    long relHour=DateUtil.dateDiff(firstAttend,secAttend,"yyyy-MM-dd HH:mm:ss","h");
+                    dayReport.setWorkHour(String.valueOf(Math.abs(relHour)));
+                    dayReport.setNotWorkHour(String.valueOf(0));
+                    dayReportList.add(dayReport);
                 }
-                dayReport.setWorkHour(String.valueOf(relHour));
-                dayReport.setNotWorkHour(String.valueOf(notWorkHour));
 
-                dayReportList.add(dayReport);
 
             }else {//打卡不正常
                 dayReport.setFirAttendTime("");

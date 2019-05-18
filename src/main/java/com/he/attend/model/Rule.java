@@ -30,6 +30,10 @@ public class Rule {
 
     private String placeName;//考勤地点名称
 
+    private Integer isWeekendAttend;//周末是否打卡 1：打卡 0 ：不打卡
+
+    private Integer isHolidayAttend;//公休日是否打卡 1：打卡 0 ：不打卡
+
     private Date createTime;  // 创建时间
 
     private Date updateTime;  // 修改时间

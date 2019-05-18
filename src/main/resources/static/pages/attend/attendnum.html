@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>考勤人数数据</title>
+    <script src="../../assets/js/echarts.js"></script>
+    <link rel="stylesheet" href="../../assets/libs/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../assets/common.css" media="all">
+</head>
+<style>
+    html {
+        background-color: #FFFFFF;
+    }
+</style>
+<body style="background-color: #FFFFFF;">
+<div class="layui-tab">
+    <ul class="layui-tab-title">
+        <li class="layui-this">打卡人数</li>
+        <li>类型统计</li>
+        <li>权限分配</li>
+        <li>商品管理</li>
+        <li>订单管理</li>
+    </ul>
+    <div class="layui-tab-content">
+        <div class="layui-tab-item layui-show">
+            <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
+            <div id="main" style="width: 600px;height:400px;float: left"></div>
+
+            <div id="typeNum" style="width: 600px;height: 400px;margin-left: 15px;margin-top:10px;float:left;"></div>
+        </div>
+        <div class="layui-tab-item">
+
+        </div>
+        <div class="layui-tab-item">内容3</div>
+        <div class="layui-tab-item">内容4</div>
+        <div class="layui-tab-item">内容5</div>
+    </div>
+</div>
+
+
+
+<script type="text/javascript" src="../../assets/libs/layui/layui.js"></script>
+<script type="text/javascript" src="../../assets/common.js"></script>
+<script>
+    //注意：选项卡 依赖 element 模块，否则无法进行功能性操作
+    layui.use(['layer', 'util','admin','laydate','element'], function(){
+        var element = layui.element;
+        var admin = layui.admin;
+
+
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+        var myChart1 = echarts.init(document.getElementById('typeNum'));
+        admin.req('staff/queryAttendAndNotAttend', {}, function (res) {
+            var attendnum=res.attendnum;
+            var notattendnum=res.notattendnum;
+            console.log(attendnum+"  "+notattendnum);
+            var option = {
+                backgroundColor: '#2c343c',
+
+                title : {
+                    text: '今日打卡人数',
+                    subtext: '',
+                    x: 'center',
+                    textStyle: {
+                        color: '#FFF',
+                        fontStyle: 'oblique',
+                        fontWeight: '400',
+                        fontFamily: 'sans-serif',
+                        fontSize: '24'
+
+                    }
+                },
+                tooltip : {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left',
+                    data: ['已打卡人数','未打卡人数'],
+                    textStyle: {
+                        color: '#FFF'
+                    }
+                },
+                series : [
+                    {
+                        name: '访问来源',
+                        type: 'pie',
+                        radius : '55%',
+                        center: ['50%', '50%'],
+                        /*color:['#f6da22','#bbe2e8'],*/
+                        data:[
+                            {value:attendnum, name:'已打卡人数'},
+                            {value:notattendnum, name:'未打卡人数'}
+                        ],
+                        itemStyle: {
+                            emphasis: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+
+            myChart.setOption(option);
+        }, 'GET');
+
+
+        admin.req('staff/queryAttendTypeNum', {}, function (res) {
+            var normal=res.normal;
+            var lateAttendNum=res.lateAttendNum;
+            var earlyAttendNum=res.earlyAttendNum;
+            var inAttend=res.inAttend;
+            var outAttend=res.outAttend;
+            var notattendnum=res.notattendnum;
+            // 指定图表的配置项和数据
+            var typeNumoption = {
+
+                title: {
+                    text: '打卡类型统计'
+                },
+                tooltip: {},
+                legend: {
+                    data:['人数']
+                },
+                xAxis: {
+                    data: ["正常","迟到","早退","内勤","外勤","未打卡"]
+                },
+                yAxis: {},
+                series: [{
+                    name: '人数',
+                    type: 'bar',
+                    data: [normal, lateAttendNum, earlyAttendNum, inAttend,outAttend,notattendnum]
+                }]
+            };
+            myChart1.setOption(typeNumoption);
+        }, 'GET');
+
+
+
+    });
+</script>
+</body>
+</html>
